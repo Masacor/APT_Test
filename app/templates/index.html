@@ -1,0 +1,277 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Farmato - Tu farmacia online de confianza</title>
+  <meta name="description" content="Farmato: Compara precios de medicamentos entre múltiples farmacias online.">
+  <!-- PRIMERO Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- LUEGO nuestro CSS personalizado -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1">
+</head>
+
+<body>
+  <!-- Header con navegación -->
+  <header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#" aria-label="Farmato - Ir a inicio">
+          <img src="{% static 'img/logo.png' %}" alt="Logo de Farmato" width="155" height="92" class="d-inline-block align-text-top">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#" aria-label="Iniciar sesión en Farmato">Iniciar sesión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" aria-label="Registrarse en Farmato">Registrarse</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="container my-4">
+    
+    <!-- Sección de estadísticas -->
+    <section class="mb-5" aria-labelledby="estadisticas-titulo">
+      <h2 id="estadisticas-titulo" class="visually-hidden">Estadísticas de Farmato</h2>
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="card-title h5">10 farmacias online</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="card-title h5">27 laboratorios</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="card-title h5">+1000 medicamentos</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de información -->
+    <section class="mb-5" aria-labelledby="informacion-titulo">
+      <h2 id="informacion-titulo" class="visually-hidden">Información sobre Farmato</h2>
+      <div class="card text-center">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="como-tab" data-bs-toggle="tab" data-bs-target="#como" type="button"
+                role="tab" aria-controls="como" aria-selected="true">
+                ¿Cómo funciona?
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="quienes-tab" data-bs-toggle="tab" data-bs-target="#quienes" type="button"
+                role="tab" aria-controls="quienes" aria-selected="false">
+                ¿Quiénes somos?
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="politicas-tab" data-bs-toggle="tab" data-bs-target="#politicas" type="button"
+                role="tab" aria-controls="politicas" aria-selected="false">
+                Políticas
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-body tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="como" role="tabpanel" aria-labelledby="como-tab">
+            <h3 class="card-title h4">Cómo funciona Farmato</h3>
+            <p class="card-text">Farmato te permite comparar precios de medicamentos entre diferentes farmacias online para que encuentres siempre la mejor opción.</p>
+            <a href="#" class="btn btn-primary" aria-label="Más información sobre cómo funciona Farmato">Más info</a>
+          </div>
+          <div class="tab-pane fade" id="quienes" role="tabpanel" aria-labelledby="quienes-tab">
+            <h3 class="card-title h4">Quiénes somos</h3>
+            <p class="card-text">Somos un equipo comprometido con facilitar el acceso a medicamentos a precios justos, conectando a usuarios con múltiples farmacias certificadas.</p>
+            <a href="#" class="btn btn-primary" aria-label="Más información sobre quiénes somos">Más info</a>
+          </div>
+          <div class="tab-pane fade" id="politicas" role="tabpanel" aria-labelledby="politicas-tab">
+            <h3 class="card-title h4">Políticas de uso</h3>
+            <p class="card-text">Respetamos tu privacidad y garantizamos la seguridad de tus datos. Consulta nuestras políticas completas de privacidad y términos de servicio.</p>
+            <a href="#" class="btn btn-primary" aria-label="Más información sobre nuestras políticas">Más info</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de medicamentos destacados -->
+    <section aria-labelledby="medicamentos-titulo">
+      <h2 id="medicamentos-titulo" class="h3 mb-4 text-center">Medicamentos Destacados</h2>
+      <div class="row g-4">
+        <!-- Paracetamol -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card h-100">
+            <img src="{% static 'img/paracetamol.jpg' %}" class="card-img-top" alt="Paracetamol 500mg - Alivia el dolor y reduce la fiebre">
+            <div class="card-body">
+              <h3 class="card-title h5">Paracetamol</h3>
+              <p class="card-text">Analgésico y antipirético utilizado para aliviar el dolor leve a moderado y reducir la fiebre.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Dosis: 500mg</li>
+              <li class="list-group-item">Presentación: Tabletas x 20</li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Redfarma
+                <span class="badge bg-success rounded-pill">$4.500</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Cruz Verde
+                <span class="badge bg-primary rounded-pill">$5.200</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Ahumada
+                <span class="badge bg-primary rounded-pill">$4.800</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dr. Simi
+                <span class="badge bg-primary rounded-pill">$4.300</span>
+              </li>
+            </ul>
+            <div class="card-footer bg-transparent">
+              <small class="text-muted">Precio más bajo: <strong>$4.300</strong> en Dr. Simi</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ibuprofeno -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card h-100">
+            <img src="{% static 'img/ibuprofeno.jpg' %}" class="card-img-top" alt="Ibuprofeno 400mg - Antiinflamatorio no esteroideo">
+            <div class="card-body">
+              <h3 class="card-title h5">Ibuprofeno</h3>
+              <p class="card-text">Antiinflamatorio no esteroideo que reduce la fiebre, alivia el dolor y la inflamación.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Dosis: 400mg</li>
+              <li class="list-group-item">Presentación: Cápsulas x 12</li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Redfarma
+                <span class="badge bg-primary rounded-pill">$7.800</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Cruz Verde
+                <span class="badge bg-primary rounded-pill">$8.100</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Ahumada
+                <span class="badge bg-success rounded-pill">$7.200</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dr. Simi
+                <span class="badge bg-primary rounded-pill">$7.500</span>
+              </li>
+            </ul>
+            <div class="card-footer bg-transparent">
+              <small class="text-muted">Precio más bajo: <strong>$7.200</strong> en Ahumada</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amoxicilina -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card h-100">
+            <img src="{% static 'img/amoxicilina.jpg' %}" class="card-img-top" alt="Amoxicilina 500mg - Antibiótico de amplio espectro">
+            <div class="card-body">
+              <h3 class="card-title h5">Amoxicilina</h3>
+              <p class="card-text">Antibiótico de amplio espectro utilizado para tratar diversas infecciones bacterianas.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Dosis: 500mg</li>
+              <li class="list-group-item">Presentación: Cápsulas x 10</li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Redfarma
+                <span class="badge bg-primary rounded-pill">$11.500</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Cruz Verde
+                <span class="badge bg-primary rounded-pill">$12.800</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Ahumada
+                <span class="badge bg-primary rounded-pill">$12.200</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dr. Simi
+                <span class="badge bg-success rounded-pill">$10.900</span>
+              </li>
+            </ul>
+            <div class="card-footer bg-transparent">
+              <small class="text-muted">Precio más bajo: <strong>$10.900</strong> en Dr. Simi</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aciclovir -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card h-100">
+            <img src="{% static 'img/aciclovir.jpg' %}" class="card-img-top" alt="Aciclovir crema - Tratamiento para herpes">
+            <div class="card-body">
+              <h3 class="card-title h5">Aciclovir</h3>
+              <p class="card-text">Antiviral utilizado para el tratamiento de infecciones por herpes, incluyendo herpes labial y genital.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Dosis: 5%</li>
+              <li class="list-group-item">Presentación: Crema 5g</li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Redfarma
+                <span class="badge bg-primary rounded-pill">$14.800</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Cruz Verde
+                <span class="badge bg-success rounded-pill">$14.200</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Ahumada
+                <span class="badge bg-primary rounded-pill">$15.500</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dr. Simi
+                <span class="badge bg-primary rounded-pill">$14.600</span>
+              </li>
+            </ul>
+            <div class="card-footer bg-transparent">
+              <small class="text-muted">Precio más bajo: <strong>$14.200</strong> en Cruz Verde</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-light py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <p class="mb-0">&copy; 2024 Farmato. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+/* ===== VARIABLES CSS ===== */
+:root {
+  --primary-color: #2c5aa0;
+  --primary-dark: #1e3d72;
+  --primary-light: #4a7fd4;
+  --secondary-color: #28a745;
+  --accent-color: #ff6b35;
+  --text-dark: #333333;
+  --text-light: #666666;
+  --text-muted: #999999;
+  --bg-light: #f8f9fa;
+  --bg-white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 5px 25px rgba(0, 0, 0, 0.15);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+/* ===== ESTILOS GENERALES ===== */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  line-height: 1.6 !important;
+  color: var(--text-dark) !important;
+  background-color: var(--bg-light) !important;
+}
+
+/* ===== HEADER Y NAVEGACIÓN - SELECTORES MÁS ESPECÍFICOS ===== */
+header .navbar.bg-body-tertiary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 0.75rem 0 !important;
+}
+
+header .navbar-brand {
+  padding: 0 !important;
+}
+
+header .navbar-brand img {
+  border-radius: 8px !important;
+  transition: var(--transition) !important;
+}
+
+header .navbar-brand:hover img {
+  transform: scale(1.05) !important;
+}
+
+header .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0 0.25rem !important;
+  border-radius: 6px !important;
+  transition: var(--transition) !important;
+}
+
+header .navbar-nav .nav-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ===== SECCIÓN DE ESTADÍSTICAS ===== */
+main .container .card {
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  transition: var(--transition) !important;
+  background: var(--bg-white) !important;
+}
+
+main .container .card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+main .container .card-body {
+  padding: 2rem 1.5rem !important;
+  text-align: center !important;
+}
+
+main .container .card-title.h5 {
+  color: var(--primary-color) !important;
+  font-weight: 700 !important;
+  font-size: 1.4rem !important;
+  position: relative !important;
+}
+
+/* Línea decorativa bajo el título */
+main .container .card-title.h5::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 40px !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color)) !important;
+  border-radius: 2px !important;
+}
+
+/* ===== PESTAÑAS INFORMATIVAS ===== */
+.card.text-center .card-header {
+  background: linear-gradient(135deg, var(--bg-white), #f1f5f9) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0 !important;
+}
+
+.card.text-center .nav-tabs {
+  border: none !important;
+}
+
+.card.text-center .nav-tabs .nav-link {
+  border: none !important;
+  padding: 1.25rem 1.5rem !important;
+  color: var(--text-light) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+.card.text-center .nav-tabs .nav-link.active {
+  color: var(--primary-color) !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+}
+
+/* Línea inferior para pestaña activa */
+.card.text-center .nav-tabs .nav-link.active::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color)) !important;
+}
+
+.card.text-center .tab-content {
+  padding: 2.5rem !important;
+}
+
+.card.text-center .tab-content .card-title.h4 {
+  color: var(--primary-dark) !important;
+  margin-bottom: 1rem !important;
+  font-size: 1.75rem !important;
+}
+
+.card.text-center .tab-content .card-text {
+  color: var(--text-light) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+}
+
+/* ===== BOTONES ===== */
+.btn.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+  border: none !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3) !important;
+}
+
+.btn.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4) !important;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)) !important;
+}
+
+/* ===== MEDICAMENTOS DESTACADOS ===== */
+section[aria-labelledby="medicamentos-titulo"] h2.h3 {
+  color: var(--primary-dark) !important;
+  font-weight: 800 !important;
+  position: relative !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Línea decorativa bajo el título de medicamentos */
+section[aria-labelledby="medicamentos-titulo"] h2.h3::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80px !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color)) !important;
+  border-radius: 2px !important;
+}
+
+/* Cards de medicamentos */
+section[aria-labelledby="medicamentos-titulo"] .card {
+  border: 1px solid var(--border-color) !important;
+  transition: var(--transition) !important;
+  height: 100% !important;
+}
+
+section[aria-labelledby="medicamentos-titulo"] .card:hover {
+  transform: translateY(-8px) !important;
+  border-color: var(--primary-light) !important;
+}
+
+section[aria-labelledby="medicamentos-titulo"] .card-img-top {
+  height: 200px !important;
+  object-fit: cover !important;
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+section[aria-labelledby="medicamentos-titulo"] .card-body {
+  padding: 1.5rem !important;
+  text-align: left !important;
+}
+
+section[aria-labelledby="medicamentos-titulo"] .card-title.h5 {
+  color: var(--primary-dark) !important;
+  font-size: 1.25rem !important;
+  text-align: left !important;
+}
+
+/* Badges de precios */
+.badge.bg-primary {
+  background: linear-gradient(135deg, #6c757d, #495057) !important;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, var(--secondary-color), #34ce57) !important;
+  box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* ===== FOOTER ===== */
+footer.bg-light {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)) !important;
+  color: white !important;
+  margin-top: auto !important;
+}
+
+footer.bg-light p {
+  color: white !important;
+  opacity: 0.9 !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  main .container .card-body {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  .card.text-center .tab-content {
+    padding: 1.5rem !important;
+  }
+  
+  section[aria-labelledby="medicamentos-titulo"] .card-img-top {
+    height: 180px !important;
+  }
+}
