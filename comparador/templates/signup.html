@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registro - FarmaComparador{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <div class="signup-card">
+        <h2>Crear Cuenta</h2>
+        <p class="signup-subtitle">Regístrate para comparar precios de medicamentos</p>
+        
+        <!-- Mostrar mensajes -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post" class="signup-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input type="text" id="nombre" name="nombre" required 
+                       placeholder="Tu nombre completo"
+                       value="{{ request.POST.nombre }}">
+                <div class="error-message" id="nombre-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo Electrónico *</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="tu@correo.com"
+                       value="{{ request.POST.email }}">
+                <div class="error-message" id="email-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required 
+                       value="{{ request.POST.fecha_nacimiento }}">
+                <div class="error-message" id="fecha-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password1">Contraseña *</label>
+                <input type="password" id="password1" name="password1" required 
+                       placeholder="Mínimo 6 caracteres"
+                       minlength="6">
+                <div class="error-message" id="password1-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password2">Confirmar Contraseña *</label>
+                <input type="password" id="password2" name="password2" required 
+                       placeholder="Repite tu contraseña"
+                       minlength="6">
+                <div class="error-message" id="password2-error"></div>
+            </div>
+            
+            <button type="submit" class="signup-button">Crear Cuenta</button>
+        </form>
+        
+        <div class="signup-links">
+            <p>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/signup.js' %}"></script>
+{% endblock %}
