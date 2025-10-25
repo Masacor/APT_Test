@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'farmacomparador.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Farmato',   # nombre de la base creada en pgAdmin
+        'USER': 'postgres',             # usuario de PostgreSQL
+        'PASSWORD': '1234',
+        'HOST': 'localhost',            # o 127.0.0.1
+        'PORT': '5432',                 # puerto por defecto de PostgreSQL
     }
 }
 
