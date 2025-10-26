@@ -15,11 +15,27 @@
 
 <div class="search-box">
     <h3>Buscar medicamento</h3>
-    <form class="search-form">
-        <input type="text" class="search-input" placeholder="Ej: Paracetamol, Ibuprofeno...">
+    <form class="search-form" method="get" action="{% url 'index' %}">
+        <input type="text" name="q" value="{{ query|default:'' }}" class="search-input" placeholder="Ej: Paracetamol, Ibuprofeno...">
         <button type="submit" class="search-button">Buscar</button>
     </form>
 </div>
+
+{% if medicamentos %}
+<div class="results-section">
+    <h3>Resultados de búsqueda</h3>
+    <ul class="results-list">
+        {% for m in medicamentos %}
+            <li class="result-item">
+                <strong>{{ m.descripcion }}</strong><br>
+                <small>{{ m.cantidadvalor }} {{ m.cantidadunidad }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+    <p style="text-align:center; margin-top:20px;">No se encontraron resultados.</p>
+{% endif %}
 
 <div class="pharmacies-section">
     <h3 class="section-title">Farmacias disponibles</h3>
@@ -30,26 +46,5 @@
         <li class="pharmacy-item">Redfarma</li>
         <li class="pharmacy-item">Salcobrand</li>
     </ul>
-</div>
-
-<div class="features">
-    <h3>¿Por qué usar FarmaComparador?</h3>
-    <div class="features-grid">
-        <div class="feature-item">
-            <div class="feature-icon">💰</div>
-            <h4>Ahorra Dinero</h4>
-            <p>Encuentra los mejores precios y ahorra en tus medicamentos</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-icon">⚡</div>
-            <h4>Ahorra Tiempo</h4>
-            <p>Compara en segundos sin visitar múltiples farmacias</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-icon">📱</div>
-            <h4>Totalmente Responsive</h4>
-            <p>Funciona perfecto en celular, tablet y computador</p>
-        </div>
-    </div>
 </div>
 {% endblock %}
