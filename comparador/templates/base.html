@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
     <header class="header">
         <div class="container">
@@ -15,8 +17,14 @@
                 <h1>FarmaComparador</h1>
                 <nav class="header-nav">
                     <a href="{% url 'index' %}">Inicio</a>
+
+                    {% if request.session.usuario_id %}
+                    <span>Hola, {{ request.session.usuario_nombre }}</span>
+                    <a href="{% url 'logout' %}" class="logout-link">Cerrar Sesión</a>
+                    {% else %}
                     <a href="{% url 'login' %}" class="login-link">Iniciar Sesión</a>
                     <a href="{% url 'signup' %}" class="signup-link">Registrarse</a>
+                    {% endif %}
                 </nav>
             </div>
         </div>
@@ -35,4 +43,5 @@
 
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

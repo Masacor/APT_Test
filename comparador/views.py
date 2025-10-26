@@ -48,7 +48,7 @@ def login(request):
                     # Guardamos sesión manualmente
                     request.session['usuario_id'] = usuario.idusuario
                     request.session['usuario_nombre'] = usuario.nombre
-                    messages.success(request, f'¡Bienvenido {usuario.nombre}!')
+                    # messages.success(request, f'¡Bienvenido {usuario.nombre}!')
                     return redirect('index')
                 else:
                     messages.error(request, 'Correo o contraseña incorrectos')
@@ -105,3 +105,9 @@ def signup(request):
             messages.error(request, f'Error al crear la cuenta: {str(e)}')
 
     return render(request, 'signup.html')
+
+
+# Logout
+def logout(request):
+    request.session.flush()
+    return redirect('index')
