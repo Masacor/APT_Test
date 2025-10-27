@@ -13,19 +13,6 @@ class Presentacion(models.Model):
     class Meta:
         db_table = 'presentacion'  # Nombre exacto de la tabla en PostgreSQL
 
-# class Usuario(models.Model):
-#     idusuario = models.AutoField(primary_key=True)
-#     nombre = models.CharField(max_length=255)
-#     email = models.CharField(max_length=255, unique=True)
-#     contraseña = models.CharField(max_length=255)
-#     proveedorauth = models.CharField(max_length=50, blank=True, null=True)
-#     idproveedor = models.CharField(max_length=255, blank=True, null=True)
-#     idcomuna = models.IntegerField(blank=True, null=True)
-#     fecharegistro = models.DateField(default=date.today)
-#     fechanacimiento = models.DateField()
-
-#     class Meta:
-#         db_table = 'usuario'  # Debe coincidir exactamente con la tabla en PostgreSQL
 
 class Usuario(models.Model):
     idusuario = models.AutoField(primary_key=True)
@@ -37,6 +24,8 @@ class Usuario(models.Model):
     idcomuna = models.IntegerField(blank=True, null=True)
     fecharegistro = models.DateField(default=date.today)  # se rellena automáticamente
     fechanacimiento = models.DateField(blank=True, null=True)
+
+    is_admin = models.BooleanField(default=False)  # 👈 Nuevo campo para admin
 
     class Meta:
         db_table = 'usuario'

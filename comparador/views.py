@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect # login
+from django.shortcuts import render, redirect, redirect, get_object_or_404 # login y admin
 from django.contrib import messages# login
 from django.contrib.auth import authenticate, login as auth_login  # login
 from django.contrib.auth.models import User
@@ -19,47 +19,138 @@ def index(request):
 
 
 # login
-def login(request):
+# def login(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+
+#         errors = []
+
+#         if not email:
+#             errors.append('El correo electrónico es obligatorio')
+#         elif '@' not in email:
+#             errors.append('Ingresa un correo electrónico válido')
+
+#         if not password:
+#             errors.append('La contraseña es obligatoria')
+#         elif len(password) < 6:
+#             errors.append('La contraseña debe tener al menos 6 caracteres')
+
+#         if errors:
+#             for error in errors:
+#                 messages.error(request, error)
+#         else:
+#             try:
+#                 usuario = Usuario.objects.get(email=email)
+                
+#                 # Verificar contraseña
+#                 if usuario.contraseña and check_password(password, usuario.contraseña):
+#                     # Guardamos sesión manualmente
+#                     request.session['usuario_id'] = usuario.idusuario
+#                     request.session['usuario_nombre'] = usuario.nombre
+#                     # messages.success(request, f'¡Bienvenido {usuario.nombre}!')
+#                     return redirect('index')
+#                 else:
+#                     messages.error(request, 'Correo o contraseña incorrectos')
+
+#             except Usuario.DoesNotExist:
+#                 messages.error(request, 'Correo o contraseña incorrectos')
+
+#     return render(request, 'login.html')
+
+
+# --------------------- Login
+def login_usuario(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
         errors = []
 
-        if not email:
-            errors.append('El correo electrónico es obligatorio')
-        elif '@' not in email:
-            errors.append('Ingresa un correo electrónico válido')
-
+        if not email or '@' not in email:
+            errors.append('Correo inválido.')
         if not password:
-            errors.append('La contraseña es obligatoria')
-        elif len(password) < 6:
-            errors.append('La contraseña debe tener al menos 6 caracteres')
+            errors.append('Contraseña obligatoria.')
 
         if errors:
-            for error in errors:
-                messages.error(request, error)
-        else:
-            try:
-                usuario = Usuario.objects.get(email=email)
-                
-                # Verificar contraseña
-                if usuario.contraseña and check_password(password, usuario.contraseña):
-                    # Guardamos sesión manualmente
-                    request.session['usuario_id'] = usuario.idusuario
-                    request.session['usuario_nombre'] = usuario.nombre
-                    # messages.success(request, f'¡Bienvenido {usuario.nombre}!')
-                    return redirect('index')
-                else:
-                    messages.error(request, 'Correo o contraseña incorrectos')
+            for e in errors:
+                messages.error(request, e)
+            return render(request, 'login.html')
 
-            except Usuario.DoesNotExist:
-                messages.error(request, 'Correo o contraseña incorrectos')
+        try:
+            usuario = Usuario.objects.get(email=email)
+            if usuario.contraseña and check_password(password, usuario.contraseña):
+                # Guardamos sesión
+                request.session['usuario_id'] = usuario.idusuario
+                request.session['usuario_nombre'] = usuario.nombre
+                request.session['is_admin'] = usuario.is_admin
+
+                if usuario.is_admin:
+                    return redirect('admin_dashboard')
+                else:
+                    return redirect('index')
+            else:
+                messages.error(request, 'Correo o contraseña incorrectos.')
+        except Usuario.DoesNotExist:
+            messages.error(request, 'Correo o contraseña incorrectos.')
 
     return render(request, 'login.html')
 
+# ----------------------  Panel de Admin CRUD
+def admin_dashboard(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
 
-# Sign up
+    # Crear usuario
+    # if request.method == 'POST' and 'crear' in request.POST:
+    #     nombre = request.POST['nombre']
+    #     correo = request.POST['correo']
+    #     contraseña = make_password(request.POST['contraseña'])
+    #     Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+    #     return redirect('admin_dashboard')
+
+    if request.method == 'POST' and 'crear' in request.POST:
+        nombre = request.POST['nombre']
+        correo = request.POST['correo']
+        contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+        Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+        return redirect('admin_dashboard')
+
+    # Editar usuario
+    # if request.method == 'POST' and 'editar' in request.POST:
+    #     usuario_id = request.POST['usuario_id']
+    #     usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+    #     usuario.nombre = request.POST['nombre']
+    #     usuario.email = request.POST['correo']
+    #     if request.POST['contraseña']:
+    #         usuario.contraseña = make_password(request.POST['contraseña'])
+    #     usuario.save()
+    #     return redirect('admin_dashboard')
+
+    if request.method == 'POST' and 'editar' in request.POST:
+        usuario_id = request.POST['usuario_id']
+        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+        usuario.nombre = request.POST['nombre']
+        usuario.email = request.POST['correo']
+        if request.POST['contraseña']:
+            usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+        usuario.save()
+        return redirect('admin_dashboard')
+
+    # Eliminar usuario
+    if request.method == 'POST' and 'eliminar' in request.POST:
+        usuario_id = request.POST['usuario_id']
+        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+        usuario.delete()
+        return redirect('admin_dashboard')
+
+
+    # Listar usuarios
+    usuarios = Usuario.objects.all()
+    return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
+
+
+
+# ----------------------- Sign up
 def signup(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -107,7 +198,7 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-# Logout
+# --------------- Logout
 def logout(request):
     request.session.flush()
     return redirect('index')

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<h2>Panel de Administración</h2>
+
+<!-- ✅ FORMULARIO CREAR USUARIO -->
+<h3>Crear nuevo usuario</h3>
+<form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="crear" value="1">
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required>
+    <label>Correo:</label>
+    <input type="email" name="correo" required>
+    <label>Contraseña:</label>
+    <input type="password" name="contraseña" required>
+    <button type="submit">Crear usuario</button>
+</form>
+
+<hr>
+
+<!-- ✅ LISTADO Y FORMULARIOS DE EDICIÓN/ELIMINACIÓN -->
+<h3>Lista de usuarios</h3>
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Contraseña</th>
+        <th>Acciones</th>
+    </tr>
+
+    {% for u in usuarios %}
+    <tr>
+        <form method="POST">
+            {% csrf_token %}
+            <td>{{ u.idusuario }}<input type="hidden" name="usuario_id" value="{{ u.idusuario }}"></td>
+            <td><input type="text" name="nombre" value="{{ u.nombre }}"></td>
+            <td><input type="email" name="correo" value="{{ u.email }}"></td>
+            <td><input type="text" name="contraseña" value="{{ u.contraseña }}"></td>
+            <td>
+                <button type="submit" name="editar" value="1">Guardar</button>
+                <button type="submit" name="eliminar" value="1"
+                    onclick="return confirm('¿Seguro que deseas eliminar este usuario?')">Eliminar</button>
+            </td>
+        </form>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
