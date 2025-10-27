@@ -1,21 +1,78 @@
-from django.shortcuts import render, redirect, redirect, get_object_or_404 # login y admin
+from django.shortcuts import render, redirect, get_object_or_404 # login y admin
 from django.contrib import messages# login
 from django.contrib.auth import authenticate, login as auth_login  # login
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password# Para sign up
 import re # Para sign up
 from datetime import datetime # Para sign up
-from .models import Presentacion, Usuario
+from .models import Presentacion, Usuario, PrecioFarmacia, Medicamento
+from django.db.models import Min
 
-# Index
-def index(request):
-    query = request.GET.get('q')  # El texto que el usuario busca
-    if query:
-        medicamentos = Presentacion.objects.filter(descripcion__icontains=query)
-    else:
-        medicamentos = Presentacion.objects.all()
+# # Index
+# def index(request):
+#     query = request.GET.get('q')  # El texto que el usuario busca
+#     if query:
+#         medicamentos = Presentacion.objects.filter(descripcion__icontains=query)
+#     else:
+#         medicamentos = Presentacion.objects.all()
     
-    return render(request, 'index.html', {'medicamentos': medicamentos, 'query': query})
+#     return render(request, 'index.html', {'medicamentos': medicamentos, 'query': query})
+
+# def index(request):
+#     query = request.GET.get('q')
+    
+#     if query:
+#         presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
+#     else:
+#         presentaciones = Presentacion.objects.all()
+    
+#     resultados = []
+    
+#     for p in presentaciones:
+#         # Todos los precios asociados a esa presentación
+#         precios = PrecioFarmacia.objects.filter(idpresentacion=p)
+        
+#         # Si hay precios
+#         for precio in precios:
+#             resultados.append({
+#                 'farmacia': precio.idfarmacia.nombrefarmacia,
+#                 'farmacia_url': precio.idfarmacia.url,
+#                 'precio': precio.precio,
+#                 'precio_oferta': precio.preciooferta,
+#                 'presentacion': p.descripcion,
+#                 'medicamento': p.idmedicamento.registrosanitario if p.idmedicamento else "",
+#                 'marca': p.idmedicamento.idmarca.nombremarca if p.idmedicamento and p.idmedicamento.idmarca else "",
+#                 'laboratorio': p.idmedicamento.idlaboratorio.nombrelaboratorio if p.idmedicamento and p.idmedicamento.idlaboratorio else "",
+#             })
+
+#     return render(request, 'index.html', {'resultados': resultados, 'query': query})
+
+def index(request):
+    query = request.GET.get('q', '')
+    resultados = []
+
+    presentaciones = Presentacion.objects.filter(descripcion__icontains=query) if query else Presentacion.objects.all()
+
+    for p in presentaciones:
+        precios = PrecioFarmacia.objects.filter(idpresentacion=p)
+        precios_por_farmacia = precios.values('idfarmacia').annotate(min_precio=Min('precio'))
+
+        for item in precios_por_farmacia:
+            precio_obj = precios.filter(idfarmacia=item['idfarmacia'], precio=item['min_precio']).first()
+            medicamento = p.idmedicamento  # ForeignKey
+
+            resultados.append({
+                'farmacia': precio_obj.idfarmacia.nombrefarmacia,
+                'precio': precio_obj.precio,
+                'precio_oferta': precio_obj.preciooferta,
+                'presentacion': f"{p.descripcion} ({p.cantidadvalor} {p.cantidadunidad})",
+                'marca': medicamento.idmarca.nombremarca if medicamento.idmarca else '',
+                'laboratorio': medicamento.idlaboratorio.nombrelaboratorio if medicamento.idlaboratorio else '',
+                'farmacia_url': precio_obj.presentacionurl
+            })
+
+    return render(request, 'index.html', {'resultados': resultados, 'query': query})
+
 
 
 # login

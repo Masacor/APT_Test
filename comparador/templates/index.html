@@ -21,30 +21,28 @@
     </form>
 </div>
 
-{% if medicamentos %}
+{% if resultados %}
 <div class="results-section">
     <h3>Resultados de búsqueda</h3>
-    <ul class="results-list">
-        {% for m in medicamentos %}
-            <li class="result-item">
-                <strong>{{ m.descripcion }}</strong><br>
-                <small>{{ m.cantidadvalor }} {{ m.cantidadunidad }}</small>
-            </li>
+    <div class="cards-container">
+        {% for r in resultados %}
+        <div class="card">
+            <h4>{{ r.farmacia }}</h4>
+            <p>Precio: ${{ r.precio }}</p>
+            {% if r.precio_oferta %}
+            <p>Oferta: ${{ r.precio_oferta }}</p>
+            {% endif %}
+            <p>Presentación: {{ r.presentacion }}</p>
+            <p>Marca: {{ r.marca }}</p>
+            <p>Laboratorio: {{ r.laboratorio }}</p>
+            {% if r.farmacia_url %}
+            <a href="{{ r.farmacia_url }}" target="_blank">Ver en farmacia</a>
+            {% endif %}
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% else %}
-    <p style="text-align:center; margin-top:20px;">No se encontraron resultados.</p>
+<p style="text-align:center; margin-top:20px;">No se encontraron resultados.</p>
 {% endif %}
-
-<div class="pharmacies-section">
-    <h3 class="section-title">Farmacias disponibles</h3>
-    <ul class="pharmacies-list">
-        <li class="pharmacy-item">Cruz Verde</li>
-        <li class="pharmacy-item">Farmacias Ahumada</li>
-        <li class="pharmacy-item">Dr. Simi</li>
-        <li class="pharmacy-item">Redfarma</li>
-        <li class="pharmacy-item">Salcobrand</li>
-    </ul>
-</div>
 {% endblock %}
