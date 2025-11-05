@@ -127,7 +127,8 @@ class Medicamento(models.Model):
     def __str__(self):
         return f"Medicamento {self.idmedicamento}"
 
-# -----------------------
+# ----------------------- Subir todos los faltantes.
+
 
 
 
