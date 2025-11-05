@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password# Para sign up
 import re # Para sign up
 from datetime import datetime # Para sign up
-from .models import Presentacion, Usuario, PrecioFarmacia, Medicamento
+from .models import Presentacion, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio
 from django.db.models import Min
 
 # # Index
@@ -72,7 +72,6 @@ def index(request):
             })
 
     return render(request, 'index.html', {'resultados': resultados, 'query': query})
-
 
 
 # login
@@ -255,7 +254,207 @@ def signup(request):
     return render(request, 'signup.html')
 
 
+def landing(request):
+    total_medicamentos = Presentacion.objects.count()
+    total_precios = PrecioFarmacia.objects.count()
+    total_usuarios = Usuario.objects.count()
+
+    return render(request, 'landing.html', {
+        'total_medicamentos': total_medicamentos,
+        'total_precios': total_precios,
+        'total_usuarios': total_usuarios,
+    })
+
 # --------------- Logout
 def logout(request):
     request.session.flush()
     return redirect('index')
+
+
+# ------------------------------------------------------------------  Panel de Admin - CRUD Medicamentos
+from django.shortcuts import render, redirect
+from comparador.models import (
+    Medicamento, MarcaComercial, Laboratorio, Presentacion,
+    MedicamentoPrincipio, PrincipioActivo, PrecioFarmacia,
+    ViasAdministracion, FormaFarmaceutica
+)
+from django.db import transaction
+
+def admin_medicamentos(request):
+    medicamentos = Medicamento.objects.all()
+    marcas = MarcaComercial.objects.all()
+    laboratorios = Laboratorio.objects.all()
+    vias = ViasAdministracion.objects.all()
+    formas = FormaFarmaceutica.objects.all()
+    principios = PrincipioActivo.objects.all()
+
+    # POST para crear, editar o eliminar
+    if request.method == 'POST':
+        # EDITAR
+        if 'editar' in request.POST:
+            try:
+                with transaction.atomic():
+                    idmed = request.POST.get('idmedicamento')
+                    med = Medicamento.objects.get(idmedicamento=idmed)
+                    med.registrosanitario = request.POST.get('registrosanitario')
+                    med.url_foto = request.POST.get('url_foto')
+
+                    idmarca = request.POST.get('idmarca')
+                    med.idmarca = MarcaComercial.objects.get(idmarca=idmarca) if idmarca else None
+
+                    idlab = request.POST.get('idlaboratorio')
+                    med.idlaboratorio = Laboratorio.objects.get(idlaboratorio=idlab) if idlab else None
+
+                    idvia = request.POST.get('id_via')
+                    med.id_via = ViasAdministracion.objects.get(id_via=idvia) if idvia else None
+
+                    idforma = request.POST.get('idforma')
+                    med.idforma = FormaFarmaceutica.objects.get(idforma=idforma) if idforma else None
+
+                    med.save()
+
+                    # Presentacion
+                    pres_qs = med.presentacion_set.all()
+                    pres = pres_qs[0] if pres_qs else None
+                    if pres:
+                        pres.cantidadunidad = request.POST.get('cantidadunidad')
+                        pres.descripcion = request.POST.get('descripcion')
+                        pres.save()
+                    # MedicamentoPrincipio
+                    mp_qs = med.medicamentoprincipio_set.all()
+                    mp = mp_qs[0] if mp_qs else None
+                    if mp:
+                        nombre_princ = request.POST.get('nombre_principio')
+                        if nombre_princ:
+                            princ, _ = PrincipioActivo.objects.get_or_create(nombre=nombre_princ)
+                            mp.idprincipio = princ
+                        mp.concentracionactivo = request.POST.get('concentracionactivo')
+                        mp.save()
+                    # Precio
+                    if pres:
+                        pf_qs = pres.preciofarmacia_set.all()
+                        pf = pf_qs[0] if pf_qs else None
+                        if pf:
+                            pf.precio = request.POST.get('precio')
+                            pf.save()
+            except Exception as e:
+                print("Error al editar:", e)
+            return redirect('admin_medicamentos')
+
+        # ELIMINAR
+        elif 'eliminar' in request.POST:
+            idmed = request.POST.get('idmedicamento')
+            try:
+                with transaction.atomic():
+                    med = Medicamento.objects.get(idmedicamento=idmed)
+                    # borrar relacionados
+                    for pres in med.presentacion_set.all():
+                        for pf in pres.preciofarmacia_set.all():
+                            pf.delete()
+                        pres.delete()
+                    for mp in med.medicamentoprincipio_set.all():
+                        mp.delete()
+                    med.delete()
+            except Exception as e:
+                print("Error al eliminar:", e)
+            return redirect('admin_medicamentos')
+
+        # CREAR
+        elif 'crear' in request.POST:
+            try:
+                with transaction.atomic():
+                    med = Medicamento.objects.create(
+                        registrosanitario=request.POST.get('registrosanitario'),
+                        url_foto=request.POST.get('url_foto')
+                    )
+                    # Presentacion
+                    Presentacion.objects.create(
+                        idmedicamento=med,
+                        cantidadvalor=0,
+                        cantidadunidad=request.POST.get('cantidadunidad', ''),
+                        descripcion=request.POST.get('descripcion', '')
+                    )
+                    # Principio
+                    nombre_princ = request.POST.get('nombre_principio')
+                    if nombre_princ:
+                        princ, _ = PrincipioActivo.objects.get_or_create(nombre=nombre_princ)
+                        MedicamentoPrincipio.objects.create(
+                            idmedicamento=med,
+                            idprincipio=princ,
+                            concentracionactivo=request.POST.get('concentracionactivo', '')
+                        )
+            except Exception as e:
+                print("Error al crear:", e)
+            return redirect('admin_medicamentos')
+
+    context = {
+        'medicamentos': medicamentos,
+        'marcas': marcas,
+        'laboratorios': laboratorios,
+        'vias': vias,
+        'formas': formas,
+        'principios': principios,
+    }
+    return render(request, 'admin_medicamentos.html', context)
+
+
+
+
+
+# ---------------------------------------------------
+"""
+def buscador_prueba(request):
+    query = request.GET.get('q', '').strip()
+    resultados = []
+
+    if query:
+        # Filtrar presentaciones que contengan la búsqueda
+        presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
+
+        for p in presentaciones:
+            # Obtener todos los precios asociados a esta presentación
+            precios = PrecioFarmacia.objects.filter(idpresentacion=p)
+            if precios.exists():
+                resultados.append({
+                    'presentacion': p,
+                    'farmacias': precios.order_by('precio')  # opcional: ordena por precio ascendente
+                })
+
+    context = {
+        'query': query,
+        'resultados': resultados
+    }
+    return render(request, 'buscador_prueba.html', context)
+
+"""
+def buscador_prueba(request):
+    query = request.GET.get('q', '').strip()
+    resultados = []
+
+    if query:
+        # Filtrar presentaciones que contengan la búsqueda
+        presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
+
+        for presentacion in presentaciones:
+            # Obtener todos los precios asociados a esta presentación
+            precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
+            if precios.exists():
+                resultados.append({
+                    'presentacion': presentacion,
+                    'farmacias': precios
+                })
+
+    context = {
+        'query': query,
+        'resultados': resultados
+    }
+    return render(request, 'buscador_prueba.html', context)
+def informacion_presentacion(request, id_presentacion):
+    presentacion = get_object_or_404(Presentacion, pk=id_presentacion)
+    precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
+    
+    context = {
+        'presentacion': presentacion,
+        'precios': precios
+    }
+    return render(request, 'informacion_presentacion.html', context)

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - Farmato{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Panel General</h1>
+
+    <div class="card-container">
+        <div class="card">
+            <h3>Número de medicamentos</h3>
+            <p class="big-number">{{ total_medicamentos }}</p>
+        </div>
+        <div class="card">
+            <h3>Número de precios</h3>
+            <p class="big-number">{{ total_precios }}</p>
+        </div>
+        <div class="card">
+            <h3>Usuarios registrados</h3>
+            <p class="big-number">{{ total_usuarios }}</p>
+        </div>
+    </div>
+
+    <div class="carousel-container">
+        <div id="tutorialCarousel" class="carousel">
+            <div class="carousel-item active">
+                <img src="{% static 'img/tutorial1.png' %}" alt="Paso 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/tutorial2.png' %}" alt="Paso 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/tutorial3.png' %}" alt="Paso 3">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

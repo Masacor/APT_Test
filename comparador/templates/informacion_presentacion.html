@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="product-detail-container">
+    <a href="{% url 'buscador_prueba' %}" class="back-button">← Volver al buscador</a>
+
+    <div class="product-card">
+        <!-- Imagen del medicamento -->
+        {% if presentacion.idmedicamento.url_foto %}
+        <div class="product-image">
+            <img src="{{ presentacion.idmedicamento.url_foto }}" alt="{{ presentacion.descripcion }}">
+        </div>
+        {% endif %}
+
+        <div class="product-info">
+            <h1>{{ presentacion.descripcion }}</h1>
+            <p><strong>Marca:</strong> {{ presentacion.idmedicamento.idmarca.nombremarca }}</p>
+            <p><strong>Laboratorio:</strong> {{ presentacion.idmedicamento.idlaboratorio.nombrelaboratorio }}</p>
+            <p><strong>Cantidad:</strong> {{ presentacion.cantidadvalor }} {{ presentacion.cantidadunidad }}</p>
+
+            <h3>Precios en farmacias</h3>
+            {% if precios %}
+            <ul class="price-list">
+                {% for precio in precios %}
+                <li>
+                    <strong>{{ precio.idfarmacia.nombrefarmacia }}</strong>: 
+                    ${{ precio.precio }} 
+                    {% if precio.preciooferta %}<span class="offer"> (Oferta: ${{ precio.preciooferta }})</span>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No hay precios registrados para esta presentación.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

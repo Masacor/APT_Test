@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FarmaComparador{% endblock %}</title>
+    <title>{% block title %}Farmato{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
@@ -14,9 +14,10 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1>FarmaComparador</h1>
+                <h1>Farmato</h1>
                 <nav class="header-nav">
-                    <a href="{% url 'index' %}">Inicio</a>
+                    <a href="{% url 'landing' %}">Inicio</a>
+                    <a href="{% url 'index' %}">Buscador</a>
 
                     {% if request.session.usuario_id %}
                     <span>Hola, {{ request.session.usuario_nombre }}</span>
@@ -37,7 +38,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 FarmaComparador - Compara precios de medicamentos en Chile</p>
+            <p>&copy; 2024 Farmato - Compara precios de medicamentos en Chile</p>
         </div>
     </footer>
 

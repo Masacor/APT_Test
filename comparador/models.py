@@ -164,6 +164,9 @@ class Medicamento(models.Model):
         null=True
     )
 
+    # 🆕 Nueva columna reflejada desde PostgreSQL
+    url_foto = models.TextField(blank=True, null=True)
+
     class Meta:
         db_table = 'medicamento'
         managed = False  # evita que Django intente crearla
