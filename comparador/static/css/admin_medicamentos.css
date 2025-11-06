@@ -1,0 +1,71 @@
+/* admin_medicamentos.css */
+h2 {
+    color: #030000;
+    margin-bottom: 10px;
+}
+
+.mensajes {
+    margin-bottom: 20px;
+}
+
+.mensajes p {
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.mensajes p.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.mensajes p.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Formulario de creación */
+form.form-crear {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+form.form-crear input[type="text"],
+form.form-crear select {
+    padding: 5px;
+    font-size: 14px;
+}
+
+/* Tabla de medicamentos */
+table.tabla-medicamentos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+
+table.tabla-medicamentos th,
+table.tabla-medicamentos td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: left;
+}
+
+table.tabla-medicamentos input[type="text"],
+table.tabla-medicamentos select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 3px;
+}
+
+table.tabla-medicamentos .acciones button {
+    margin-right: 5px;
+    padding: 3px 6px;
+    cursor: pointer;
+}
+
+/* Evitar conflictos con base.css */
+main.container h1, main.container h2 {
+    margin-top: 20px;
+}
+

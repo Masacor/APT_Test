@@ -1,0 +1,156 @@
+/* admin_presentacion.css */
+
+/* Títulos */
+h1 {
+    color: #f9f3f3;
+    margin-bottom: 15px;
+}
+
+/* Mensajes */
+.messages {
+    margin-bottom: 15px;
+}
+
+.messages li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Botones */
+button,
+.btnSubmit {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover,
+.btnSubmit:hover {
+    opacity: 0.85;
+}
+
+button#btnCrear {
+    background-color: #4CAF50;
+    color: #fff;
+    border-color: #4CAF50;
+}
+
+button#btnCrear:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+}
+
+button.btnEliminar {
+    background-color: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
+}
+
+button.btnEliminar:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+/* Tabla de presentaciones */
+table.tabla-presentaciones {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table.tabla-presentaciones th,
+table.tabla-presentaciones td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+    font-size: 14px;
+}
+
+table.tabla-presentaciones tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table.tabla-presentaciones .acciones button {
+    margin-right: 5px;
+    padding: 3px 6px;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 80px auto;
+    padding: 20px;
+    border-radius: 6px;
+    width: 400px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 5px;
+    margin-top: 3px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-content textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Botón cerrar modal */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Ajustes para evitar conflictos con base.html */
+main.container h1,
+main.container h2 {
+    margin-top: 15px;
+}

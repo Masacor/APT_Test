@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrar Presentaciones{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/admin_presentacion.css' %}">
+
+<div class="container">
+    <h2>Presentaciones</h2><br>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <button id="btnCrear" class="btn">Crear Presentación</button><br><br>
+
+    <table class="tabla-presentaciones">
+        <thead>
+            <tr>
+                <th>Medicamento</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in presentaciones %}
+            <tr>
+                <td>{{ p.idmedicamento.registrosanitario|default:"N/A" }}</td>
+                <td>{{ p.cantidadvalor }}</td>
+                <td>{{ p.cantidadunidad }}</td>
+                <td>{{ p.descripcion }}</td>
+                <td class="acciones">
+                    <button class="btnEditar"
+                        data-id="{{ p.idpresentacion }}"
+                        {% if p.idmedicamento %}
+                            data-medicamento="{{ p.idmedicamento.idmedicamento }}"
+                        {% else %}
+                            data-medicamento=""
+                        {% endif %}
+                        data-cantidadvalor="{{ p.cantidadvalor }}"
+                        data-cantidadunidad="{{ p.cantidadunidad }}"
+                        data-descripcion="{{ p.descripcion }}">
+                        Editar
+                    </button>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="eliminar">
+                        <input type="hidden" name="idpresentacion" value="{{ p.idpresentacion }}">
+                        <button type="submit" class="btnEliminar">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Crear/Editar -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Crear Presentación</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="action" value="crear">
+            <input type="hidden" name="idpresentacion" id="idpresentacion">
+
+            <label>Medicamento:</label>
+            <select name="idmedicamento" id="idmedicamento">
+                <option value="">-- Seleccione --</option>
+                {% for m in medicamentos %}
+                <option value="{{ m.idmedicamento }}">{{ m.registrosanitario|default:"N/A" }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Cantidad:</label>
+            <input type="number" name="cantidadvalor" id="cantidadvalor" required>
+
+            <label>Unidad:</label>
+            <input type="text" name="cantidadunidad" id="cantidadunidad" required>
+
+            <label>Descripción:</label>
+            <textarea name="descripcion" id="descripcion" required></textarea>
+
+            <button type="submit" class="btnSubmit">Guardar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+const modal = document.getElementById("modal");
+const btnCrear = document.getElementById("btnCrear");
+const spanClose = document.getElementsByClassName("close")[0];
+
+btnCrear.onclick = function() {
+    document.getElementById("modalTitle").innerText = "Crear Presentación";
+    document.getElementById("action").value = "crear";
+    document.getElementById("idpresentacion").value = "";
+    document.getElementById("idmedicamento").value = "";
+    document.getElementById("cantidadvalor").value = "";
+    document.getElementById("cantidadunidad").value = "";
+    document.getElementById("descripcion").value = "";
+    modal.style.display = "block";
+}
+
+spanClose.onclick = function() { modal.style.display = "none"; }
+window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+
+// Editar
+document.querySelectorAll(".btnEditar").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.getElementById("modalTitle").innerText = "Editar Presentación";
+        document.getElementById("action").value = "editar";
+        document.getElementById("idpresentacion").value = btn.dataset.id;
+        document.getElementById("idmedicamento").value = btn.dataset.medicamento;
+        document.getElementById("cantidadvalor").value = btn.dataset.cantidadvalor;
+        document.getElementById("cantidadunidad").value = btn.dataset.cantidadunidad;
+        document.getElementById("descripcion").value = btn.dataset.descripcion;
+        modal.style.display = "block";
+    });
+});
+</script>
+{% endblock %}

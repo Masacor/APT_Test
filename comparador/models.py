@@ -2,6 +2,7 @@ from django.db import models
 from datetime import date # Para el modelo de usuario - fechas de registro y fecha de nacimiento
 from django.contrib.auth.hashers import make_password
 
+
 # Create your models here.
 # -----------------------
 # class Presentacion(models.Model):
@@ -14,6 +15,8 @@ from django.contrib.auth.hashers import make_password
 #     class Meta:
 #         db_table = 'presentacion'  # Nombre exacto de la tabla en PostgreSQL
 
+
+
 class Presentacion(models.Model):
     idpresentacion = models.AutoField(primary_key=True)
     idmedicamento = models.ForeignKey(
@@ -23,13 +26,20 @@ class Presentacion(models.Model):
         blank=True,
         null=True
     )
+
     cantidadvalor = models.IntegerField()
     cantidadunidad = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=255)
 
+
+
+
     class Meta:
         db_table = 'presentacion'
         managed = False
+    
+
+
 
 
 # -----------------------
@@ -412,3 +422,6 @@ class Usuario(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+

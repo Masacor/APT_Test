@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password# Para sign up
 import re # Para sign up
 from datetime import datetime # Para sign up
-from .models import Presentacion, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio
-from django.db.models import Min
+from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion
+from django.db.models import Min, Max
 
 # # Index
 # def index(request):
@@ -270,137 +270,6 @@ def logout(request):
     request.session.flush()
     return redirect('index')
 
-
-# ------------------------------------------------------------------  Panel de Admin - CRUD Medicamentos
-from django.shortcuts import render, redirect
-from comparador.models import (
-    Medicamento, MarcaComercial, Laboratorio, Presentacion,
-    MedicamentoPrincipio, PrincipioActivo, PrecioFarmacia,
-    ViasAdministracion, FormaFarmaceutica
-)
-from django.db import transaction
-
-def admin_medicamentos(request):
-    medicamentos = Medicamento.objects.all()
-    marcas = MarcaComercial.objects.all()
-    laboratorios = Laboratorio.objects.all()
-    vias = ViasAdministracion.objects.all()
-    formas = FormaFarmaceutica.objects.all()
-    principios = PrincipioActivo.objects.all()
-
-    # POST para crear, editar o eliminar
-    if request.method == 'POST':
-        # EDITAR
-        if 'editar' in request.POST:
-            try:
-                with transaction.atomic():
-                    idmed = request.POST.get('idmedicamento')
-                    med = Medicamento.objects.get(idmedicamento=idmed)
-                    med.registrosanitario = request.POST.get('registrosanitario')
-                    med.url_foto = request.POST.get('url_foto')
-
-                    idmarca = request.POST.get('idmarca')
-                    med.idmarca = MarcaComercial.objects.get(idmarca=idmarca) if idmarca else None
-
-                    idlab = request.POST.get('idlaboratorio')
-                    med.idlaboratorio = Laboratorio.objects.get(idlaboratorio=idlab) if idlab else None
-
-                    idvia = request.POST.get('id_via')
-                    med.id_via = ViasAdministracion.objects.get(id_via=idvia) if idvia else None
-
-                    idforma = request.POST.get('idforma')
-                    med.idforma = FormaFarmaceutica.objects.get(idforma=idforma) if idforma else None
-
-                    med.save()
-
-                    # Presentacion
-                    pres_qs = med.presentacion_set.all()
-                    pres = pres_qs[0] if pres_qs else None
-                    if pres:
-                        pres.cantidadunidad = request.POST.get('cantidadunidad')
-                        pres.descripcion = request.POST.get('descripcion')
-                        pres.save()
-                    # MedicamentoPrincipio
-                    mp_qs = med.medicamentoprincipio_set.all()
-                    mp = mp_qs[0] if mp_qs else None
-                    if mp:
-                        nombre_princ = request.POST.get('nombre_principio')
-                        if nombre_princ:
-                            princ, _ = PrincipioActivo.objects.get_or_create(nombre=nombre_princ)
-                            mp.idprincipio = princ
-                        mp.concentracionactivo = request.POST.get('concentracionactivo')
-                        mp.save()
-                    # Precio
-                    if pres:
-                        pf_qs = pres.preciofarmacia_set.all()
-                        pf = pf_qs[0] if pf_qs else None
-                        if pf:
-                            pf.precio = request.POST.get('precio')
-                            pf.save()
-            except Exception as e:
-                print("Error al editar:", e)
-            return redirect('admin_medicamentos')
-
-        # ELIMINAR
-        elif 'eliminar' in request.POST:
-            idmed = request.POST.get('idmedicamento')
-            try:
-                with transaction.atomic():
-                    med = Medicamento.objects.get(idmedicamento=idmed)
-                    # borrar relacionados
-                    for pres in med.presentacion_set.all():
-                        for pf in pres.preciofarmacia_set.all():
-                            pf.delete()
-                        pres.delete()
-                    for mp in med.medicamentoprincipio_set.all():
-                        mp.delete()
-                    med.delete()
-            except Exception as e:
-                print("Error al eliminar:", e)
-            return redirect('admin_medicamentos')
-
-        # CREAR
-        elif 'crear' in request.POST:
-            try:
-                with transaction.atomic():
-                    med = Medicamento.objects.create(
-                        registrosanitario=request.POST.get('registrosanitario'),
-                        url_foto=request.POST.get('url_foto')
-                    )
-                    # Presentacion
-                    Presentacion.objects.create(
-                        idmedicamento=med,
-                        cantidadvalor=0,
-                        cantidadunidad=request.POST.get('cantidadunidad', ''),
-                        descripcion=request.POST.get('descripcion', '')
-                    )
-                    # Principio
-                    nombre_princ = request.POST.get('nombre_principio')
-                    if nombre_princ:
-                        princ, _ = PrincipioActivo.objects.get_or_create(nombre=nombre_princ)
-                        MedicamentoPrincipio.objects.create(
-                            idmedicamento=med,
-                            idprincipio=princ,
-                            concentracionactivo=request.POST.get('concentracionactivo', '')
-                        )
-            except Exception as e:
-                print("Error al crear:", e)
-            return redirect('admin_medicamentos')
-
-    context = {
-        'medicamentos': medicamentos,
-        'marcas': marcas,
-        'laboratorios': laboratorios,
-        'vias': vias,
-        'formas': formas,
-        'principios': principios,
-    }
-    return render(request, 'admin_medicamentos.html', context)
-
-
-
-
-
 # ---------------------------------------------------
 """
 def buscador_prueba(request):
@@ -429,28 +298,101 @@ def buscador_prueba(request):
 """
 def buscador_prueba(request):
     query = request.GET.get('q', '').strip()
+    filtros_marcas = request.GET.getlist('marca')
+    filtros_principios = request.GET.getlist('principio')
+    filtros_vias = request.GET.getlist('via')
+    precio_min_input = request.GET.get('precio_min')
+    precio_max_input = request.GET.get('precio_max')
+
     resultados = []
 
-    if query:
-        # Filtrar presentaciones que contengan la búsqueda
-        presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
+    # Limpiar valores vacíos
+    filtros_marcas = [int(f) for f in filtros_marcas if f.isdigit()]
+    filtros_principios = [int(f) for f in filtros_principios if f.isdigit()]
+    filtros_vias = [int(f) for f in filtros_vias if f.isdigit()]
 
-        for presentacion in presentaciones:
-            # Obtener todos los precios asociados a esta presentación
-            precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
-            if precios.exists():
-                resultados.append({
-                    'presentacion': presentacion,
-                    'farmacias': precios
-                })
+    # Filtrar presentaciones
+    presentaciones = Presentacion.objects.all()
+    if query:
+        presentaciones = presentaciones.filter(descripcion__icontains=query)
+
+    if filtros_marcas:
+        presentaciones = presentaciones.filter(
+            idmedicamento__idmarca__idmarca__in=filtros_marcas
+        )
+
+    if filtros_principios:
+        presentaciones = presentaciones.filter(
+            idmedicamento__medicamentoprincipio__idprincipio__in=filtros_principios
+        )
+
+    if filtros_vias:
+        presentaciones = presentaciones.filter(
+            idmedicamento__id_via__id_via__in=filtros_vias
+        )
+
+    if precio_min_input:
+        presentaciones = presentaciones.filter(preciofarmacia__precio__gte=precio_min_input)
+    if precio_max_input:
+        presentaciones = presentaciones.filter(preciofarmacia__precio__lte=precio_max_input)
+
+    presentaciones = presentaciones.distinct()
+
+    # Obtener resultados con precio mínimo
+    for presentacion in presentaciones:
+        precio_obj = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio').first()
+        if precio_obj:
+            resultados.append({
+                'presentacion': presentacion,
+                'precio': precio_obj.precio,  # solo el valor numérico
+                'farmacia': precio_obj.idfarmacia.nombrefarmacia,  # nombre de la farmacia
+            })
+
+    # IDs de medicamentos en resultados
+    medicamentos_ids = presentaciones.values_list('idmedicamento_id', flat=True).distinct()
+
+    # Filtros dinámicos basados en resultados
+    marcas_disponibles = MarcaComercial.objects.filter(
+        idmarca__in=medicamentos_ids
+    ).distinct()
+
+    principios_disponibles = PrincipioActivo.objects.filter(
+        medicamentoprincipio__idmedicamento_id__in=medicamentos_ids
+    ).distinct()
+
+    vias_disponibles = ViasAdministracion.objects.filter(
+        id_via__in=medicamentos_ids
+    ).distinct()
+
+    # Precio global de la búsqueda (para slider)
+    precio_global = PrecioFarmacia.objects.aggregate(
+        precio_min=Min('precio'),
+        precio_max=Max('precio')
+    )
+    precio_min = precio_global['precio_min'] or 0
+    precio_max = precio_global['precio_max'] or 1000
 
     context = {
         'query': query,
-        'resultados': resultados
+        'resultados': resultados,
+        'marcas': marcas_disponibles,
+        'principios': principios_disponibles,
+        'vias': vias_disponibles,
+        'filtros_marcas': [str(f) for f in filtros_marcas],
+        'filtros_principios': [str(f) for f in filtros_principios],
+        'filtros_vias': [str(f) for f in filtros_vias],
+        'precio_min': precio_min,
+        'precio_max': precio_max,
+        'filtro_min': precio_min_input or precio_min,
+        'filtro_max': precio_max_input or precio_max,
     }
+
     return render(request, 'buscador_prueba.html', context)
-def informacion_presentacion(request, id_presentacion):
-    presentacion = get_object_or_404(Presentacion, pk=id_presentacion)
+
+
+
+def informacion_presentacion(request, descripcion):
+    presentacion = get_object_or_404(Presentacion, descripcion=descripcion)
     precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
     
     context = {
@@ -458,3 +400,142 @@ def informacion_presentacion(request, id_presentacion):
         'precios': precios
     }
     return render(request, 'informacion_presentacion.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# --------------------- CRUDS de todo
+def admin_medicamentos(request):
+    # --- Crear nuevo medicamento ---
+    if request.method == 'POST' and 'crear_medicamento' in request.POST:
+        registrosanitario = request.POST.get('registrosanitario', '').strip()
+        idlaboratorio = request.POST.get('idlaboratorio') or None
+        idmarca = request.POST.get('idmarca') or None
+        idforma = request.POST.get('idforma') or None
+        id_via = request.POST.get('id_via') or None
+        url_foto = request.POST.get('url_foto', '').strip()
+
+        try:
+            medicamento = Medicamento(
+                registrosanitario=registrosanitario,
+                idlaboratorio=Laboratorio.objects.get(pk=idlaboratorio) if idlaboratorio else None,
+                idmarca=MarcaComercial.objects.get(pk=idmarca) if idmarca else None,
+                idforma=FormaFarmaceutica.objects.get(pk=idforma) if idforma else None,
+                id_via=ViasAdministracion.objects.get(pk=id_via) if id_via else None,
+                url_foto=url_foto
+            )
+            medicamento.save()
+            messages.success(request, 'Medicamento creado correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al crear el medicamento: {str(e)}')
+        return redirect('admin_medicamentos')
+
+    # --- Editar medicamento ---
+    if request.method == 'POST' and 'editar_medicamento' in request.POST:
+        medicamento_id = request.POST.get('idmedicamento')
+        medicamento = get_object_or_404(Medicamento, pk=medicamento_id)
+
+        medicamento.registrosanitario = request.POST.get('registrosanitario', '').strip()
+        idlaboratorio = request.POST.get('idlaboratorio') or None
+        idmarca = request.POST.get('idmarca') or None
+        idforma = request.POST.get('idforma') or None
+        id_via = request.POST.get('id_via') or None
+        medicamento.url_foto = request.POST.get('url_foto', '').strip()
+
+        try:
+            medicamento.idlaboratorio = Laboratorio.objects.get(pk=idlaboratorio) if idlaboratorio else None
+            medicamento.idmarca = MarcaComercial.objects.get(pk=idmarca) if idmarca else None
+            medicamento.idforma = FormaFarmaceutica.objects.get(pk=idforma) if idforma else None
+            medicamento.id_via = ViasAdministracion.objects.get(pk=id_via) if id_via else None
+            medicamento.save()
+            messages.success(request, 'Medicamento actualizado correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar el medicamento: {str(e)}')
+        return redirect('admin_medicamentos')
+
+    # --- Eliminar medicamento ---
+    if request.method == 'POST' and 'eliminar_medicamento' in request.POST:
+        medicamento_id = request.POST.get('idmedicamento')
+        medicamento = get_object_or_404(Medicamento, pk=medicamento_id)
+        try:
+            medicamento.delete()
+            messages.success(request, 'Medicamento eliminado correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el medicamento: {str(e)}')
+        return redirect('admin_medicamentos')
+
+    # --- Datos para mostrar en la tabla y selects ---
+    medicamentos = Medicamento.objects.all()
+    laboratorios = Laboratorio.objects.all()
+    marcas = MarcaComercial.objects.all()
+    formas = FormaFarmaceutica.objects.all()
+    vias = ViasAdministracion.objects.all()
+
+    context = {
+        'medicamentos': medicamentos,
+        'laboratorios': laboratorios,
+        'marcas': marcas,
+        'formas': formas,
+        'vias': vias,
+    }
+    return render(request, 'admin_medicamentos.html', context)
+# ---------------------------------------------------
+
+# ------------------ Presentacion
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Presentacion, Medicamento
+
+def presentacion(request):
+    if request.method == "POST":
+        action = request.POST.get("action")
+        id_presentacion = request.POST.get("idpresentacion")
+        idmedicamento = request.POST.get("idmedicamento") or None
+        cantidadvalor = request.POST.get("cantidadvalor")
+        cantidadunidad = request.POST.get("cantidadunidad")
+        descripcion = request.POST.get("descripcion")
+
+        # Convertir idmedicamento a objeto Medicamento o None
+        medicamento = Medicamento.objects.filter(idmedicamento=idmedicamento).first() if idmedicamento else None
+
+        if action == "crear":
+            Presentacion.objects.create(
+                idmedicamento=medicamento,
+                cantidadvalor=cantidadvalor,
+                cantidadunidad=cantidadunidad,
+                descripcion=descripcion
+            )
+            messages.success(request, "Presentación creada correctamente.")
+        elif action == "editar" and id_presentacion:
+            present = get_object_or_404(Presentacion, idpresentacion=id_presentacion)
+            present.idmedicamento = medicamento
+            present.cantidadvalor = cantidadvalor
+            present.cantidadunidad = cantidadunidad
+            present.descripcion = descripcion
+            present.save()
+            messages.success(request, "Presentación actualizada correctamente.")
+        elif action == "eliminar" and id_presentacion:
+            present = get_object_or_404(Presentacion, idpresentacion=id_presentacion)
+            present.delete()
+            messages.success(request, "Presentación eliminada correctamente.")
+        else:
+            messages.error(request, "Error en la acción realizada.")
+
+        return redirect("presentacion")
+
+    # GET
+    presentaciones = Presentacion.objects.all().select_related('idmedicamento')
+    medicamentos = Medicamento.objects.all()
+    return render(request, "admin_presentacion.html", {
+        "presentaciones": presentaciones,
+        "medicamentos": medicamentos
+    })

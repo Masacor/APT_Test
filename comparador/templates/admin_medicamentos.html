@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administrar Medicamentos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_medicamentos.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h1>Administrar Medicamentos</h1>
+
+<!-- Mensajes -->
+{% if messages %}
+    <div class="mensajes">
+        {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Formulario para crear medicamento -->
+<h2>Crear nuevo medicamento</h2>
+<form method="POST" class="form-crear">
+    {% csrf_token %}
+    <input type="hidden" name="crear_medicamento" value="1">
+
+    <input type="text" name="registrosanitario" placeholder="Registro Sanitario">
+    
+    <select name="idlaboratorio">
+        <option value="">-- Laboratorio --</option>
+        {% for lab in laboratorios %}
+            <option value="{{ lab.idlaboratorio }}">{{ lab.nombrelaboratorio }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="idmarca">
+        <option value="">-- Marca --</option>
+        {% for marca in marcas %}
+            <option value="{{ marca.idmarca }}">{{ marca.nombremarca }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="idforma">
+        <option value="">-- Forma --</option>
+        {% for forma in formas %}
+            <option value="{{ forma.idforma }}">{{ forma.nombreforma }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="id_via">
+        <option value="">-- Vía --</option>
+        {% for via in vias %}
+            <option value="{{ via.id_via }}">{{ via.via }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="url_foto" placeholder="URL Foto">
+    <button type="submit">Crear</button>
+</form>
+
+<!-- Tabla de medicamentos editable -->
+<h2>Medicamentos</h2>
+<table class="tabla-medicamentos">
+    <thead>
+        <tr>
+            <th>Registro Sanitario</th>
+            <th>Laboratorio</th>
+            <th>Marca</th>
+            <th>Forma</th>
+            <th>Vía</th>
+            <th>URL Foto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for med in medicamentos %}
+        <tr>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="editar_medicamento" value="1">
+                <input type="hidden" name="idmedicamento" value="{{ med.idmedicamento }}">
+
+                <td><input type="text" name="registrosanitario" value="{{ med.registrosanitario }}"></td>
+
+                <td>
+                    <select name="idlaboratorio">
+                        <option value="">--</option>
+                        {% for lab in laboratorios %}
+                            <option value="{{ lab.idlaboratorio }}" {% if med.idlaboratorio and med.idlaboratorio.idlaboratorio == lab.idlaboratorio %}selected{% endif %}>
+                                {{ lab.nombrelaboratorio }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <td>
+                    <select name="idmarca">
+                        <option value="">--</option>
+                        {% for marca in marcas %}
+                            <option value="{{ marca.idmarca }}" {% if med.idmarca and med.idmarca.idmarca == marca.idmarca %}selected{% endif %}>
+                                {{ marca.nombremarca }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <td>
+                    <select name="idforma">
+                        <option value="">--</option>
+                        {% for forma in formas %}
+                            <option value="{{ forma.idforma }}" {% if med.idforma and med.idforma.idforma == forma.idforma %}selected{% endif %}>
+                                {{ forma.nombreforma }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <td>
+                    <select name="id_via">
+                        <option value="">--</option>
+                        {% for via in vias %}
+                            <option value="{{ via.id_via }}" {% if med.id_via and med.id_via.id_via == via.id_via %}selected{% endif %}>
+                                {{ via.via }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <td><input type="text" name="url_foto" value="{{ med.url_foto }}"></td>
+
+                <td class="acciones">
+                    <button type="submit">Guardar</button>
+            </form>
+            <!-- Formulario para eliminar -->
+            <form method="POST" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="eliminar_medicamento" value="1">
+                <input type="hidden" name="idmedicamento" value="{{ med.idmedicamento }}">
+                <button type="submit" onclick="return confirm('¿Eliminar este medicamento?')">Eliminar</button>
+            </form>
+                </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No hay medicamentos registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
