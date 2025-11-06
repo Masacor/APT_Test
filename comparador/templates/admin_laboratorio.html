@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrar Laboratorios{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/admin_laboratorio.css' %}">
+
+<div class="laboratorio-container">
+    <h2>Laboratorios</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <table class="laboratorio-tabla">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del Laboratorio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lab in laboratorios %}
+            <tr>
+                <form method="post">
+                    {% csrf_token %}
+                    <td>{{ lab.idlaboratorio }}</td>
+                    <td>
+                        <input type="text" name="nombrelaboratorio" value="{{ lab.nombrelaboratorio }}" class="input-text">
+                        <input type="hidden" name="idlaboratorio" value="{{ lab.idlaboratorio }}">
+                    </td>
+                    <td>
+                        <button type="submit" name="editar" class="btn editar">Guardar</button>
+                        <button type="submit" name="eliminar" class="btn eliminar" onclick="return confirm('¿Seguro que deseas eliminar este laboratorio?')">Eliminar</button>
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+            <tr class="fila-agregar">
+                <form method="post">
+                    {% csrf_token %}
+                    <td>—</td>
+                    <td><input type="text" name="nombrelaboratorio" placeholder="Nuevo laboratorio" class="input-text"></td>
+                    <td><button type="submit" name="agregar" class="btn agregar">Agregar</button></td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

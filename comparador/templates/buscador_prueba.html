@@ -188,7 +188,7 @@
         {% if resultados %}
             {% for item in resultados %}
                 {% with precio_min=item.farmacias.first %}
-                <a href="" class="card-link">
+                <a href="{% url 'detalle_presentacion' item.presentacion.idpresentacion %}" class="card-link">
                     <div class="card">
                         <img src="{{ item.presentacion.idmedicamento.url_foto|default:'/static/img/default_medicamento.png' }}" alt="{{ item.presentacion.descripcion }}">
                         <div class="card-content">

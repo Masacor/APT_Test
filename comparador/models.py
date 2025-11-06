@@ -2,6 +2,8 @@ from django.db import models
 from datetime import date # Para el modelo de usuario - fechas de registro y fecha de nacimiento
 from django.contrib.auth.hashers import make_password
 
+from django.utils.text import slugify
+
 
 # Create your models here.
 # -----------------------
@@ -38,7 +40,12 @@ class Presentacion(models.Model):
         db_table = 'presentacion'
         managed = False
     
-
+    @property
+    def compuesto(self):
+        marca = self.idmedicamento.idmarca.nombremarca if self.idmedicamento and self.idmedicamento.idmarca else "MarcaDesconocida"
+        principio = self.idmedicamento.medicamentoprincipio.nombre if self.idmedicamento and hasattr(self.idmedicamento, 'medicamentoprincipio') else "PrincipioDesconocido"
+        cantidad = f"{self.cantidadvalor} {self.cantidadunidad}" if self.cantidadvalor and self.cantidadunidad else "CantidadDesconocida"
+        return f"{marca} - {principio} - {cantidad}"
 
 
 

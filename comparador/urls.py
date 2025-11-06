@@ -10,6 +10,10 @@ urlpatterns = [
     path('buscadorprueba/', views.buscador_prueba, name='buscador_prueba'),
     # urls.py
     path('presentacion/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
+    # Detalle de presentación (por id)
+    path('detalle/<int:id>/', views.detalle_presentacion, name='detalle_presentacion'),
+    path('medicamento/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
+
 
 
 
@@ -24,5 +28,8 @@ urlpatterns = [
 
     # PRESENTACION
     path('dashboard/presentacion/', views.presentacion, name='presentacion'),
+
+    # LABORATORIO
+    path('dashboard/laboratorio/', views.laboratorio, name='laboratorio')
 
 ]

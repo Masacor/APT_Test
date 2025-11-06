@@ -7,6 +7,10 @@ import re # Para sign up
 from datetime import datetime # Para sign up
 from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion
 from django.db.models import Min, Max
+from django.http import Http404
+
+
+
 
 # # Index
 # def index(request):
@@ -401,8 +405,40 @@ def informacion_presentacion(request, descripcion):
     }
     return render(request, 'informacion_presentacion.html', context)
 
+def detalle_presentacion(request, id):
+    """Mostrar detalle de una presentación por su id (idpresentacion).
 
+    Antes la vista intentaba buscar por `slug` pero el modelo de
+    `Presentacion` no define un campo `slug`. Aquí usamos el PK
+    `idpresentacion` para garantizar que la vista funcione con los
+    registros existentes.
+    """
+    presentacion = get_object_or_404(Presentacion, pk=id)
 
+    # Precios asociados (ordenados por precio ascendente)
+    precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
+
+    # Datos del medicamento relacionado (si existe)
+    medicamento = presentacion.idmedicamento
+    marca = None
+    laboratorio = None
+    principios = PrincipioActivo.objects.none()
+    if medicamento:
+        marca = medicamento.idmarca if hasattr(medicamento, 'idmarca') else None
+        laboratorio = medicamento.idlaboratorio if hasattr(medicamento, 'idlaboratorio') else None
+        # Principios activos asociados al medicamento
+        principios = PrincipioActivo.objects.filter(medicamentoprincipio__idmedicamento=medicamento).distinct()
+
+    context = {
+        'presentacion': presentacion,
+        'medicamento': medicamento,
+        'marca': marca,
+        'laboratorio': laboratorio,
+        'principios': principios,
+        'precios': precios,
+    }
+
+    return render(request, 'detalle_presentacion.html', context)
 
 
 
@@ -539,3 +575,56 @@ def presentacion(request):
         "presentaciones": presentaciones,
         "medicamentos": medicamentos
     })
+# ---------------------
+
+# --------------------- Laboratorio
+def laboratorio(request):
+    # Crear nuevo laboratorio
+    if request.method == 'POST':
+        if 'agregar' in request.POST:
+            nombre = request.POST.get('nombrelaboratorio', '').strip()
+
+            # Validaciones
+            if not nombre:
+                messages.error(request, "El nombre del laboratorio no puede estar vacío.")
+            elif Laboratorio.objects.filter(nombrelaboratorio__iexact=nombre).exists():
+                messages.error(request, "Ya existe un laboratorio con ese nombre.")
+            else:
+                Laboratorio.objects.create(nombrelaboratorio=nombre)
+                messages.success(request, "Laboratorio agregado correctamente.")
+            return redirect('laboratorio')
+
+        # Editar laboratorio existente
+        elif 'editar' in request.POST:
+            idlaboratorio = request.POST.get('idlaboratorio')
+            nombre = request.POST.get('nombrelaboratorio', '').strip()
+
+            try:
+                lab = Laboratorio.objects.get(pk=idlaboratorio)
+                if not nombre:
+                    messages.error(request, "El nombre del laboratorio no puede estar vacío.")
+                elif Laboratorio.objects.filter(nombrelaboratorio__iexact=nombre).exclude(pk=idlaboratorio).exists():
+                    messages.error(request, "Ya existe un laboratorio con ese nombre.")
+                else:
+                    lab.nombrelaboratorio = nombre
+                    lab.save()
+                    messages.success(request, "Laboratorio actualizado correctamente.")
+            except Laboratorio.DoesNotExist:
+                messages.error(request, "El laboratorio no existe.")
+
+            return redirect('laboratorio')
+
+        # Eliminar laboratorio
+        elif 'eliminar' in request.POST:
+            idlaboratorio = request.POST.get('idlaboratorio')
+            try:
+                lab = Laboratorio.objects.get(pk=idlaboratorio)
+                lab.delete()
+                messages.success(request, "Laboratorio eliminado correctamente.")
+            except Laboratorio.DoesNotExist:
+                messages.error(request, "El laboratorio no existe.")
+            return redirect('laboratorio')
+
+    # Listar todos los laboratorios
+    laboratorios = Laboratorio.objects.all().order_by('idlaboratorio')
+    return render(request, 'admin_laboratorio.html', {'laboratorios': laboratorios})
