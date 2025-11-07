@@ -20,8 +20,8 @@ urlpatterns = [
     # ADMIN
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
-    # USUARIO
-    #path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    # USUARIO - PROXIMO
+    path('dashboard/usuario/', views.admin_usuario, name='admin_usuario'),
 
     # MEDICAMENTO
     path('dashboard/medicamentos/', views.admin_medicamentos, name='admin_medicamentos'),
@@ -38,7 +38,7 @@ urlpatterns = [
     # VIAS_ADMINISTRACION
     path('dashboard/vias_administracion/', views.vias_administracion, name='admin_vias_administracion'),
 
-    # FORMAFARMACEUTICA
+    # FORMAFARMACEUTICA - SE DEBE ARREGLAR PQ NO DEJA ACTUALIZAR EL ELEMENTO, DICE QUE NO SE PUEDE INSERTAR ALGO VACIO
     path('dashboard/formafarmaceutica/', views.formafarmaceutica, name='admin_formafarmaceutica'),
 
     # PRINCIPIOACTIVO
@@ -46,7 +46,14 @@ urlpatterns = [
 
 
 
-    # Los que faltan
-    # path('dashboard/principioactivo/', views.principioactivo, name='admin_principioactivo'),
+    # LOS QUE FALTAN
+    # MEDICAMENTO_PRINCIPIO
+    # path('dashboard/medicamento_principio/', views.medicamento_principio, name='admin_medicamento_principio'),
+
+    # MEDICAMENTO_CATEGORIA
+    # path('dashboard/medicamento_categoria/', views.medicamento_categoria, name='admin_medicamento_categoria'),
+
+    # PRECIOFARMACIA
+    # path('dashboard/preciofarmacia/', views.preciofarmacia, name='admin_preciofarmacia'),
 
 ]

@@ -158,57 +158,57 @@ def login_usuario(request):
     return render(request, 'login.html')
 
 # ----------------------  Panel de Admin CRUD
-def admin_dashboard(request):
-    if not request.session.get('is_admin'):
-        return redirect('login')
+# def admin_dashboard(request):
+#     if not request.session.get('is_admin'):
+#         return redirect('login')
 
-    # Crear usuario
-    # if request.method == 'POST' and 'crear' in request.POST:
-    #     nombre = request.POST['nombre']
-    #     correo = request.POST['correo']
-    #     contraseña = make_password(request.POST['contraseña'])
-    #     Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
-    #     return redirect('admin_dashboard')
+#     # Crear usuario
+#     # if request.method == 'POST' and 'crear' in request.POST:
+#     #     nombre = request.POST['nombre']
+#     #     correo = request.POST['correo']
+#     #     contraseña = make_password(request.POST['contraseña'])
+#     #     Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+#     #     return redirect('admin_dashboard')
 
-    if request.method == 'POST' and 'crear' in request.POST:
-        nombre = request.POST['nombre']
-        correo = request.POST['correo']
-        contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-        Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
-        return redirect('admin_dashboard')
+#     if request.method == 'POST' and 'crear' in request.POST:
+#         nombre = request.POST['nombre']
+#         correo = request.POST['correo']
+#         contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+#         Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+#         return redirect('admin_dashboard')
 
-    # Editar usuario
-    # if request.method == 'POST' and 'editar' in request.POST:
-    #     usuario_id = request.POST['usuario_id']
-    #     usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-    #     usuario.nombre = request.POST['nombre']
-    #     usuario.email = request.POST['correo']
-    #     if request.POST['contraseña']:
-    #         usuario.contraseña = make_password(request.POST['contraseña'])
-    #     usuario.save()
-    #     return redirect('admin_dashboard')
+#     # Editar usuario
+#     # if request.method == 'POST' and 'editar' in request.POST:
+#     #     usuario_id = request.POST['usuario_id']
+#     #     usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+#     #     usuario.nombre = request.POST['nombre']
+#     #     usuario.email = request.POST['correo']
+#     #     if request.POST['contraseña']:
+#     #         usuario.contraseña = make_password(request.POST['contraseña'])
+#     #     usuario.save()
+#     #     return redirect('admin_dashboard')
 
-    if request.method == 'POST' and 'editar' in request.POST:
-        usuario_id = request.POST['usuario_id']
-        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-        usuario.nombre = request.POST['nombre']
-        usuario.email = request.POST['correo']
-        if request.POST['contraseña']:
-            usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-        usuario.save()
-        return redirect('admin_dashboard')
+#     if request.method == 'POST' and 'editar' in request.POST:
+#         usuario_id = request.POST['usuario_id']
+#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+#         usuario.nombre = request.POST['nombre']
+#         usuario.email = request.POST['correo']
+#         if request.POST['contraseña']:
+#             usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+#         usuario.save()
+#         return redirect('admin_dashboard')
 
-    # Eliminar usuario
-    if request.method == 'POST' and 'eliminar' in request.POST:
-        usuario_id = request.POST['usuario_id']
-        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-        usuario.delete()
-        return redirect('admin_dashboard')
+#     # Eliminar usuario
+#     if request.method == 'POST' and 'eliminar' in request.POST:
+#         usuario_id = request.POST['usuario_id']
+#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+#         usuario.delete()
+#         return redirect('admin_dashboard')
 
 
-    # Listar usuarios
-    usuarios = Usuario.objects.all()
-    return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
+#     # Listar usuarios
+#     usuarios = Usuario.objects.all()
+#     return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
 
 
 
@@ -506,7 +506,95 @@ def detalle_presentacion(request, id):
 
 
 # --------------------- CRUDS de todo
+
+# -------------------- Usuario
+# def admin_dashboard(request):
+#     if not request.session.get('is_admin'):
+#         return redirect('login')
+
+#     # Crear usuario
+#     if request.method == 'POST' and 'crear' in request.POST:
+#         nombre = request.POST['nombre']
+#         correo = request.POST['correo']
+#         contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+#         Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+#         return redirect('admin_dashboard')
+
+#     # Editar usuario
+#     if request.method == 'POST' and 'editar' in request.POST:
+#         usuario_id = request.POST['usuario_id']
+#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+#         usuario.nombre = request.POST['nombre']
+#         usuario.email = request.POST['correo']
+#         if request.POST['contraseña']:
+#             usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+#         usuario.save()
+#         return redirect('admin_dashboard')
+
+#     # Eliminar usuario
+#     if request.method == 'POST' and 'eliminar' in request.POST:
+#         usuario_id = request.POST['usuario_id']
+#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+#         usuario.delete()
+#         return redirect('admin_dashboard')
+
+
+#     # Listar usuarios
+#     usuarios = Usuario.objects.all()
+#     return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
+
+
+# ----------------------- DASHBOARD
+def admin_dashboard(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+    
+    return render(request, 'admin_dashboard.html')
+# -----------------------
+
+# -------------------- Usuario
+def admin_usuario(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
+    # Crear usuario
+    if request.method == 'POST' and 'crear' in request.POST:
+        nombre = request.POST['nombre']
+        correo = request.POST['correo']
+        contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+        Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
+        return redirect('admin_usuario')  # 🔹 redirige a la nueva view
+
+    # Editar usuario
+    if request.method == 'POST' and 'editar' in request.POST:
+        usuario_id = request.POST['usuario_id']
+        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+        usuario.nombre = request.POST['nombre']
+        usuario.email = request.POST['correo']
+        if request.POST['contraseña']:
+            usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
+        usuario.save()
+        return redirect('admin_usuario')
+
+    # Eliminar usuario
+    if request.method == 'POST' and 'eliminar' in request.POST:
+        usuario_id = request.POST['usuario_id']
+        usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+        usuario.delete()
+        return redirect('admin_usuario')
+
+
+    # Listar usuarios
+    usuarios = Usuario.objects.all()
+    return render(request, 'admin_usuario.html', {'usuarios': usuarios})  # 🔹 nuevo html
+
+# --------------------------------
+
+# ------------------------------- Medicamentos
 def admin_medicamentos(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     # --- Crear nuevo medicamento ---
     if request.method == 'POST' and 'crear_medicamento' in request.POST:
         registrosanitario = request.POST.get('registrosanitario', '').strip()
@@ -588,6 +676,10 @@ from django.contrib import messages
 from .models import Presentacion, Medicamento
 
 def presentacion(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
+
     if request.method == "POST":
         action = request.POST.get("action")
         id_presentacion = request.POST.get("idpresentacion")
@@ -635,6 +727,9 @@ def presentacion(request):
 
 # --------------------- Laboratorio
 def laboratorio(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     # Crear nuevo laboratorio
     if request.method == 'POST':
         if 'agregar' in request.POST:
@@ -688,6 +783,9 @@ def laboratorio(request):
 
 # --------------------------- Marcacomercial
 def marcacomercial(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     """
     Vista basada en funciones para CRUD de MarcaComercial.
     Soporta acciones por botones: agregar, editar y eliminar (según name del submit).
@@ -751,6 +849,9 @@ def marcacomercial(request):
 
 # --------------- Vias_administracion
 def vias_administracion(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     """
     Vista FBV para administrar la tabla vias_administracion.
     Maneja acciones: agregar, editar, eliminar a través del nombre del botón en el POST.
@@ -828,6 +929,9 @@ def vias_administracion(request):
 
 # ----------------------- FormaFarmaceutica
 def formafarmaceutica(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     # Crear nueva forma farmacéutica
     if request.method == 'POST' and 'agregar' in request.POST:
         nombre = request.POST.get('nombreforma', '').strip()
@@ -882,6 +986,9 @@ def formafarmaceutica(request):
 
 # -------------------- PrincipioActivo
 def principioactivo(request):
+    if not request.session.get('is_admin'):
+        return redirect('login')
+
     if request.method == 'POST':
         # AGREGAR
         if 'agregar' in request.POST:
@@ -926,3 +1033,7 @@ def principioactivo(request):
     # LEER
     principios = PrincipioActivo.objects.all().order_by('idprincipio')
     return render(request, 'admin_principioactivo.html', {'principios': principios})
+# --------------------------------
+
+# ----------------------- PrecioFarmacia
+
