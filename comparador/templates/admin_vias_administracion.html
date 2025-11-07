@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrar Vías de Administración{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_vias_administracion.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="vias-admin-container">
+    <h2>Vías de Administración</h2>
+
+    <!-- Mensajes -->
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% else %}info{% endif %}">
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <table class="table-vias">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vía de administración</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for via in vias %}
+            <tr>
+                <form method="post">
+                    {% csrf_token %}
+                    <td>{{ via.id_via }}</td>
+                    <td>
+                        <input type="text" name="via" value="{{ via.via }}" maxlength="100">
+                        <input type="hidden" name="id_via" value="{{ via.id_via }}">
+                    </td>
+                    <td>
+                        <textarea name="descripcion" maxlength="255">{{ via.descripcion }}</textarea>
+                    </td>
+                    <td>
+                        <button type="submit" name="editar" class="btn btn-save">Guardar</button>
+                        <button type="submit" name="eliminar" class="btn btn-delete"
+                            onclick="return confirm('¿Seguro que deseas eliminar esta vía?')">Eliminar</button>
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+
+            <!-- Fila para agregar nueva vía -->
+            <tr>
+                <form method="post">
+                    {% csrf_token %}
+                    <td>—</td>
+                    <td><input type="text" name="via" placeholder="Nueva vía" maxlength="100"></td>
+                    <td><textarea name="descripcion" placeholder="Descripción..." maxlength="255"></textarea></td>
+                    <td><button type="submit" name="agregar" class="btn btn-primary">Agregar</button></td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

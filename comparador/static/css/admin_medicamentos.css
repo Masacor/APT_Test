@@ -1,110 +1,177 @@
 /* --------------------------------------------
-   marcacomercial.css - estilo tipo admin_medicamentos
+   admin_medicamentos.css
+   Estilo de panel administrativo moderno
 -------------------------------------------- */
 
-/* Título */
-h2.marcacomercial-titulo {
-    color: #030000;
-    margin-bottom: 10px;
+/* Contenedor general */
+body {
+    background-color: #f4f6f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* Título principal */
+h1 {
+    text-align: center;
+    margin-top: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Subtítulos */
+h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    border-left: 6px solid #2ecc71;
+    padding-left: 10px;
 }
 
 /* Mensajes */
 .mensajes {
-    margin-bottom: 20px;
+    width: 80%;
+    margin: 10px auto;
 }
 
 .mensajes p {
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 500;
 }
 
 .mensajes p.success {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #2ecc71;
+    color: white;
 }
 
 .mensajes p.error {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #e74c3c;
+    color: white;
 }
 
 /* Formulario de creación */
-form.form-crear-marca {
+form.form-crear {
+    width: 85%;
+    margin: 0 auto 25px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    justify-content: space-between;
 }
 
-form.form-crear-marca input[type="text"] {
-    padding: 5px;
-    font-size: 14px;
+form.form-crear input[type="text"],
+form.form-crear select {
     flex: 1;
-}
-
-/* Botones */
-form.form-crear-marca .btn {
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-form.form-crear-marca .btn-secondary {
-    background-color: #f5f5f5;
-    color: #333;
+    min-width: 180px;
+    padding: 8px;
     border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    transition: 0.2s;
 }
 
-/* Tabla de marcas */
-table.tabla-marcas {
-    width: 100%;
+form.form-crear input[type="text"]:focus,
+form.form-crear select:focus {
+    border-color: #2ecc71;
+    background-color: #fff;
+}
+
+form.form-crear button {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+form.form-crear button:hover {
+    background-color: #27ae60;
+}
+
+/* Tabla de medicamentos */
+table.tabla-medicamentos {
+    width: 90%;
+    margin: 0 auto 40px auto;
     border-collapse: collapse;
-    margin-bottom: 40px;
+    font-size: 15px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-table.tabla-marcas th,
-table.tabla-marcas td {
+table.tabla-medicamentos th,
+table.tabla-medicamentos td {
     border: 1px solid #ccc;
-    padding: 5px;
-    text-align: left;
-}
-
-table.tabla-marcas input[type="text"] {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 3px;
-}
-
-/* Botones dentro de la tabla */
-table.tabla-marcas .acciones button {
-    margin-right: 5px;
-    padding: 3px 6px;
-    cursor: pointer;
-}
-
-/* Edición inline */
-.view-mode {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.edit-mode {
-    display: none;
-    gap: 5px;
-    align-items: center;
-}
-
-/* Mensaje cuando no hay marcas */
-.empty-marcas {
-    padding: 12px;
-    border: 1px dashed #ccc;
-    border-radius: 4px;
-    color: #555;
+    padding: 10px;
     text-align: center;
 }
 
-/* Evitar conflictos con base.css */
-main.container h1,
-main.container h2 {
-    margin-top: 20px;
+table.tabla-medicamentos th {
+    background-color: #2ecc71;
+    color: white;
+    font-weight: 600;
+}
+
+table.tabla-medicamentos tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+table.tabla-medicamentos tr:hover {
+    background-color: #eafaf1;
+}
+
+/* Inputs y selects dentro de la tabla */
+table.tabla-medicamentos input[type="text"],
+table.tabla-medicamentos select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+    box-sizing: border-box;
+}
+
+/* Botones de acciones */
+.acciones button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.acciones button[type="submit"]:first-child {
+    background-color: #3498db;
+}
+
+.acciones button[type="submit"]:first-child:hover {
+    background-color: #2980b9;
+}
+
+.acciones button[onclick] {
+    background-color: #e74c3c;
+}
+
+.acciones button[onclick]:hover {
+    background-color: #c0392b;
+}
+
+/* Fila vacía */
+table.tabla-medicamentos td[colspan] {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    padding: 15px;
 }

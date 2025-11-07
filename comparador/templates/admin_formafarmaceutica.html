@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administrar Forma Farmacéutica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_formafarmaceutica.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ff-container">
+    <h2>Formas Farmacéuticas</h2>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        <ul class="ff-messages">
+            {% for message in messages %}
+                <li class="ff-message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Formulario de creación -->
+    <form method="post" class="ff-form-inline">
+        {% csrf_token %}
+        <input type="text" name="nombreforma" placeholder="Nueva forma farmacéutica">
+        <button type="submit" name="agregar" class="ff-btn ff-btn-guardar">Guardar</button>
+    </form>
+
+    <!-- Tabla de formas farmacéuticas -->
+    {% if formas %}
+        <table class="ff-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre de la forma</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for forma in formas %}
+                <tr>
+                    <td>{{ forma.idforma }}</td>
+                    <td>
+                        <input type="text" name="nombreforma_{{ forma.idforma }}" value="{{ forma.nombreforma }}" form="form_{{ forma.idforma }}">
+                    </td>
+                    <td>
+                        <form method="post" id="form_{{ forma.idforma }}" class="ff-inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="idforma" value="{{ forma.idforma }}">
+                            <button type="submit" name="editar" class="ff-btn ff-btn-guardar">Guardar</button>
+                            <button type="submit" name="eliminar" class="ff-btn ff-btn-eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta forma farmacéutica?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay formas farmacéuticas registradas.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+/* Contenedor principal */
+.ff-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+/* Título */
+.ff-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Mensajes */
+.ff-messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+.ff-message {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.ff-message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.ff-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Formularios */
+.ff-form-inline,
+.ff-inline-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ff-inline-form {
+    display: inline-flex;
+    gap: 5px;
+}
+
+/* Inputs */
+.ff-form-inline input[type="text"],
+.ff-inline-form input[type="text"] {
+    padding: 5px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Botones */
+.ff-btn {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Guardar */
+.ff-btn-guardar {
+    background-color: #007bff;
+    color: white;
+}
+
+.ff-btn-guardar:hover {
+    background-color: #0056b3;
+}
+
+/* Eliminar */
+.ff-btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.ff-btn-eliminar:hover {
+    background-color: #a71d2a;
+}
+
+/* Tabla */
+.ff-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ff-table th,
+.ff-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.ff-table th {
+    background-color: #f1f1f1;
+}
+
+/* Inputs dentro de tabla */
+.ff-table input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}

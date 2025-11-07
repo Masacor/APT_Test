@@ -35,4 +35,13 @@ urlpatterns = [
     # MARCACOMERCIAL
     path('dashboard/marcacomercial/', views.marcacomercial, name='admin_marcacomercial'), 
 
+    # VIAS_ADMINISTRACION
+    path('dashboard/vias_administracion/', views.vias_administracion, name='admin_vias_administracion'),
+
+    # FORMAFARMACEUTICA
+    path('dashboard/formafarmaceutica/', views.formafarmaceutica, name='admin_formafarmaceutica'),
+
+    # PRINCIPIOACTIVO
+    #path('dashboard/formafarmaceutica/', views.formafarmaceutica, name='admin_formafarmaceutica'),
+
 ]

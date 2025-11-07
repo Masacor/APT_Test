@@ -307,8 +307,7 @@ def buscador_prueba(request):
     filtros_marcas = request.GET.getlist('marca')
     filtros_principios = request.GET.getlist('principio')
     filtros_vias = request.GET.getlist('via')
-    precio_min_input = request.GET.get('precio_min')
-    precio_max_input = request.GET.get('precio_max')
+    precio_filtro = request.GET.get('precio')  # Ahora solo un precio
 
     resultados = []
 
@@ -337,10 +336,9 @@ def buscador_prueba(request):
             idmedicamento__id_via__id_via__in=filtros_vias
         )
 
-    if precio_min_input:
-        presentaciones = presentaciones.filter(preciofarmacia__precio__gte=precio_min_input)
-    if precio_max_input:
-        presentaciones = presentaciones.filter(preciofarmacia__precio__lte=precio_max_input)
+    if precio_filtro:
+        # Si hay un precio seleccionado, filtramos presentaciones menores o iguales a ese precio
+        presentaciones = presentaciones.filter(preciofarmacia__precio__lte=precio_filtro)
 
     presentaciones = presentaciones.distinct()
 
@@ -389,8 +387,7 @@ def buscador_prueba(request):
         'filtros_vias': [str(f) for f in filtros_vias],
         'precio_min': precio_min,
         'precio_max': precio_max,
-        'filtro_min': precio_min_input or precio_min,
-        'filtro_max': precio_max_input or precio_max,
+        'precio_actual': precio_filtro or precio_max,  # Valor actual del slider (por defecto el máximo)
     }
 
     return render(request, 'buscador_prueba.html', context)
@@ -441,6 +438,40 @@ def detalle_presentacion(request, id):
     }
 
     return render(request, 'detalle_presentacion.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -694,3 +725,133 @@ def marcacomercial(request):
     }
     return render(request, 'admin_marcacomercial.html', context)
 # ----------------------------------------
+
+# --------------- Vias_administracion
+def vias_administracion(request):
+    """
+    Vista FBV para administrar la tabla vias_administracion.
+    Maneja acciones: agregar, editar, eliminar a través del nombre del botón en el POST.
+    """
+    if request.method == 'POST':
+        # --- AGREGAR nueva vía ---
+        if 'agregar' in request.POST:
+            via = request.POST.get('via', '').strip()
+            descripcion = request.POST.get('descripcion', '').strip()
+
+            # Validaciones requeridas
+            if not via:
+                messages.error(request, "El nombre de la vía no puede estar vacío.")
+            elif not descripcion:
+                messages.error(request, "La descripción no puede estar vacía.")
+            else:
+                try:
+                    nueva = ViasAdministracion(via=via, descripcion=descripcion)
+                    nueva.save()
+                    messages.success(request, "Vía de administración creada correctamente.")
+                    return redirect('admin_vias_administracion')
+                except Exception as e:
+                    # Mensaje genérico si falla creación por otra razón
+                    messages.error(request, f"No se pudo crear la vía: {str(e)}")
+
+        # --- EDITAR vía existente ---
+        elif 'editar' in request.POST:
+            try:
+                id_via = request.POST.get('id_via')
+                via_val = request.POST.get('via', '').strip()
+                descripcion_val = request.POST.get('descripcion', '').strip()
+
+                # Validaciones
+                if not via_val:
+                    messages.error(request, "El nombre de la vía no puede estar vacío.")
+                elif not descripcion_val:
+                    messages.error(request, "La descripción no puede estar vacía.")
+                else:
+                    try:
+                        via_obj = ViasAdministracion.objects.get(pk=id_via)
+                        via_obj.via = via_val
+                        via_obj.descripcion = descripcion_val
+                        via_obj.save()
+                        messages.success(request, "Vía actualizada correctamente.")
+                        return redirect('admin_vias_administracion')
+                    except ViasAdministracion.DoesNotExist:
+                        messages.error(request, "La vía a editar no existe.")
+            except Exception as e:
+                messages.error(request, f"No se pudo editar la vía: {str(e)}")
+
+        # --- ELIMINAR vía ---
+        elif 'eliminar' in request.POST:
+            id_via = request.POST.get('id_via')
+            try:
+                via_obj = ViasAdministracion.objects.get(pk=id_via)
+                try:
+                    via_obj.delete()
+                    messages.success(request, "Vía eliminada correctamente.")
+                    return redirect('admin_vias_administracion')
+                except IntegrityError:
+                    # Si existe restricción FK con medicamentos u otra tabla
+                    messages.error(request, "No se puede eliminar la vía porque está asociada a uno o más medicamentos.")
+                except Exception as e:
+                    messages.error(request, f"No se pudo eliminar la vía: {str(e)}")
+            except ViasAdministracion.DoesNotExist:
+                messages.error(request, "La vía a eliminar no existe.")
+
+    # GET y render de listado
+    vias = ViasAdministracion.objects.all().order_by('id_via')
+    context = {
+        'vias': vias,
+    }
+    return render(request, 'admin_vias_administracion.html', context)
+# -------------------------------------------------
+
+# ----------------------- FormaFarmaceutica
+def formafarmaceutica(request):
+    # Crear nueva forma farmacéutica
+    if request.method == 'POST' and 'agregar' in request.POST:
+        nombre = request.POST.get('nombreforma', '').strip()
+        if not nombre:
+            messages.error(request, "El nombre de la forma farmacéutica no puede estar vacío.")
+        else:
+            try:
+                FormaFarmaceutica.objects.create(nombreforma=nombre)
+                messages.success(request, f"Forma farmacéutica '{nombre}' creada correctamente.")
+            except Exception as e:
+                messages.error(request, f"No se pudo crear la forma farmacéutica: {str(e)}")
+
+        return redirect('admin_formafarmaceutica')
+
+    # Editar forma farmacéutica existente
+    if request.method == 'POST' and 'editar' in request.POST:
+        idforma = request.POST.get('idforma')
+        nombre = request.POST.get('nombreforma', '').strip()
+        if not nombre:
+            messages.error(request, "El nombre de la forma farmacéutica no puede estar vacío.")
+        else:
+            try:
+                forma = FormaFarmaceutica.objects.get(idforma=idforma)
+                forma.nombreforma = nombre
+                forma.save()
+                messages.success(request, f"Forma farmacéutica actualizada correctamente.")
+            except FormaFarmaceutica.DoesNotExist:
+                messages.error(request, "La forma farmacéutica no existe.")
+            except Exception as e:
+                messages.error(request, f"No se pudo actualizar la forma farmacéutica: {str(e)}")
+        return redirect('admin_formafarmaceutica')
+
+    # Eliminar forma farmacéutica
+    if request.method == 'POST' and 'eliminar' in request.POST:
+        idforma = request.POST.get('idforma')
+        try:
+            forma = FormaFarmaceutica.objects.get(idforma=idforma)
+            forma.delete()
+            messages.success(request, f"Forma farmacéutica eliminada correctamente.")
+        except FormaFarmaceutica.DoesNotExist:
+            messages.error(request, "La forma farmacéutica no existe.")
+        except IntegrityError:
+            messages.error(request, "No se puede eliminar esta forma farmacéutica porque está referenciada en otros registros.")
+        except Exception as e:
+            messages.error(request, f"No se pudo eliminar la forma farmacéutica: {str(e)}")
+        return redirect('admin_formafarmaceutica')
+
+    # Mostrar todas las formas farmacéuticas
+    formas = FormaFarmaceutica.objects.all().order_by('idforma')
+    return render(request, 'admin_formafarmaceutica.html', {'formas': formas})

@@ -1,0 +1,118 @@
+/* Contenedor principal */
+.vias-admin-container {
+    width: 80%;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: "Inter", Arial, sans-serif;
+    color: #333;
+}
+
+/* Título */
+.vias-admin-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    color: #333;
+}
+
+/* Mensajes de éxito / error / info */
+.vias-admin-container .messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.vias-admin-container .messages li {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Tipos de mensaje */
+.vias-admin-container .messages li.success {
+    background-color: #2ecc71; /* verde */
+    color: #fff;
+}
+
+.vias-admin-container .messages li.error {
+    background-color: #e74c3c; /* rojo */
+    color: #fff;
+}
+
+.vias-admin-container .messages li.info {
+    background-color: #3498db; /* azul */
+    color: #fff;
+}
+
+/* Tabla */
+.vias-admin-container .table-vias {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.vias-admin-container .table-vias th,
+.vias-admin-container .table-vias td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.vias-admin-container .table-vias th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    text-align: left;
+    color: #333;
+}
+
+.vias-admin-container .table-vias tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Inputs dentro de la tabla */
+.vias-admin-container input[type="text"],
+.vias-admin-container textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+/* Textarea para descripción más alto */
+.vias-admin-container textarea {
+    min-height: 40px;
+    resize: vertical;
+}
+
+/* Botones */
+.vias-admin-container .btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+    color: #fff;
+}
+
+.vias-admin-container .btn-save,
+.vias-admin-container .btn-primary {
+    background-color: #2ecc71;
+}
+
+.vias-admin-container .btn-delete {
+    background-color: #e74c3c;
+}
+
+.vias-admin-container .btn:hover {
+    opacity: 0.85;
+}
