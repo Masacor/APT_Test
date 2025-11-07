@@ -414,8 +414,31 @@ def detalle_presentacion(request, id):
     """
     presentacion = get_object_or_404(Presentacion, pk=id)
 
-    # Precios asociados (ordenados por precio ascendente)
-    precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
+    # Precios asociados (agrupados por URL y tomando el más reciente por ID y fecha)
+    from django.db.models import Max
+    
+    # Primero obtenemos los URLs únicos y su ID más reciente
+    urls_recientes = PrecioFarmacia.objects.filter(
+        idpresentacion=presentacion
+    ).values('presentacionurl').annotate(
+        ultimo_id=Max('idprecio'),
+        ultima_fecha=Max('fecharegistro')
+    )
+    
+    # Luego obtenemos los precios más recientes para cada URL
+    precios = []
+    for url_data in urls_recientes:
+        precio_reciente = PrecioFarmacia.objects.filter(
+            idpresentacion=presentacion,
+            presentacionurl=url_data['presentacionurl'],
+            idprecio=url_data['ultimo_id'],
+            fecharegistro=url_data['ultima_fecha']
+        ).first()
+        if precio_reciente:
+            precios.append(precio_reciente)
+    
+    # Ordenamos la lista final por precio
+    precios.sort(key=lambda x: x.precio)
 
     # Datos del medicamento relacionado (si existe)
     medicamento = presentacion.idmedicamento
@@ -855,3 +878,51 @@ def formafarmaceutica(request):
     # Mostrar todas las formas farmacéuticas
     formas = FormaFarmaceutica.objects.all().order_by('idforma')
     return render(request, 'admin_formafarmaceutica.html', {'formas': formas})
+# -----------------------------------
+
+# -------------------- PrincipioActivo
+def principioactivo(request):
+    if request.method == 'POST':
+        # AGREGAR
+        if 'agregar' in request.POST:
+            nombre = request.POST.get('nombre', '').strip()
+            if not nombre:
+                messages.error(request, "El nombre del principio activo no puede estar vacío.")
+            else:
+                try:
+                    PrincipioActivo.objects.create(nombre=nombre)
+                    messages.success(request, "Principio activo agregado correctamente.")
+                    return redirect('admin_principioactivo')
+                except Exception as e:
+                    messages.error(request, f"Error al agregar el principio activo: {e}")
+
+        # EDITAR
+        elif 'editar' in request.POST:
+            idprincipio = request.POST.get('idprincipio')
+            nombre = request.POST.get('nombre', '').strip()
+            if not nombre:
+                messages.error(request, "El nombre del principio activo no puede estar vacío.")
+            else:
+                try:
+                    principio = get_object_or_404(PrincipioActivo, pk=idprincipio)
+                    principio.nombre = nombre
+                    principio.save()
+                    messages.success(request, "Principio activo actualizado correctamente.")
+                    return redirect('admin_principioactivo')
+                except Exception as e:
+                    messages.error(request, f"Error al actualizar el principio activo: {e}")
+
+        # ELIMINAR
+        elif 'eliminar' in request.POST:
+            idprincipio = request.POST.get('idprincipio')
+            try:
+                principio = get_object_or_404(PrincipioActivo, pk=idprincipio)
+                principio.delete()
+                messages.success(request, "Principio activo eliminado correctamente.")
+                return redirect('admin_principioactivo')
+            except Exception as e:
+                messages.error(request, f"No se puede eliminar este principio activo: {e}")
+
+    # LEER
+    principios = PrincipioActivo.objects.all().order_by('idprincipio')
+    return render(request, 'admin_principioactivo.html', {'principios': principios})

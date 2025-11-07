@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administrar Principios Activos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_principioactivo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container principioactivo-container">
+    <h2>Principios Activos</h2>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Formulario para agregar nuevo principio activo -->
+    <form method="post" class="form-agregar">
+        {% csrf_token %}
+        <input type="text" name="nombre" placeholder="Nombre del principio activo" required>
+        <button type="submit" name="agregar" class="btn btn-guardar">Guardar</button>
+    </form>
+
+    {% if principios %}
+        <table class="tabla-principios">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del principio activo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in principios %}
+                <tr>
+                    <td>{{ p.idprincipio }}</td>
+                    <td>
+                        <form method="post" class="form-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="idprincipio" value="{{ p.idprincipio }}">
+                            <input type="text" name="nombre" value="{{ p.nombre }}" required>
+                    </td>
+                    <td>
+                            <button type="submit" name="editar" class="btn btn-guardar">Guardar</button>
+                            <button type="submit" name="eliminar" class="btn btn-eliminar">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay principios activos registrados.</p>
+    {% endif %}
+</div>
+{% endblock %}

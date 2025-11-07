@@ -2,12 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('buscador/', views.index, name='index'),
+    path('buscadorprueba/', views.index, name='index'),
     path('login/', views.login_usuario, name='login'),
     path('signup/', views.signup, name='signup'),
     path('logout/', views.logout, name='logout'),
     path('', views.landing, name='landing'),
-    path('buscadorprueba/', views.buscador_prueba, name='buscador_prueba'),
+    path('buscador/', views.buscador_prueba, name='buscador_prueba'),
     # urls.py
     path('presentacion/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
     # Detalle de presentación (por id)
@@ -42,6 +42,11 @@ urlpatterns = [
     path('dashboard/formafarmaceutica/', views.formafarmaceutica, name='admin_formafarmaceutica'),
 
     # PRINCIPIOACTIVO
-    #path('dashboard/formafarmaceutica/', views.formafarmaceutica, name='admin_formafarmaceutica'),
+    path('dashboard/principioactivo/', views.principioactivo, name='admin_principioactivo'),
+
+
+
+    # Los que faltan
+    # path('dashboard/principioactivo/', views.principioactivo, name='admin_principioactivo'),
 
 ]
