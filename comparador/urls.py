@@ -30,6 +30,9 @@ urlpatterns = [
     path('dashboard/presentacion/', views.presentacion, name='presentacion'),
 
     # LABORATORIO
-    path('dashboard/laboratorio/', views.laboratorio, name='laboratorio')
+    path('dashboard/laboratorio/', views.laboratorio, name='laboratorio'),
+
+    # MARCACOMERCIAL
+    path('dashboard/marcacomercial/', views.marcacomercial, name='admin_marcacomercial'), 
 
 ]

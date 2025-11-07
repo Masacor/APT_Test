@@ -8,6 +8,8 @@ from datetime import datetime # Para sign up
 from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion
 from django.db.models import Min, Max
 from django.http import Http404
+from django.db import IntegrityError, transaction
+from django.db.models.deletion import ProtectedError
 
 
 
@@ -628,3 +630,67 @@ def laboratorio(request):
     # Listar todos los laboratorios
     laboratorios = Laboratorio.objects.all().order_by('idlaboratorio')
     return render(request, 'admin_laboratorio.html', {'laboratorios': laboratorios})
+# ---------------------------------------------------------
+
+# --------------------------- Marcacomercial
+def marcacomercial(request):
+    """
+    Vista basada en funciones para CRUD de MarcaComercial.
+    Soporta acciones por botones: agregar, editar y eliminar (según name del submit).
+    """
+    if request.method == 'POST':
+        # --- AGREGAR ---
+        if 'agregar' in request.POST:
+            nombremarca = (request.POST.get('nombremarca') or '').strip()
+            if not nombremarca:
+                messages.error(request, "El nombre de la marca no puede estar vacío.")
+                return redirect('admin_marcacomercial')
+            try:
+                # Crear nuevo registro
+                MarcaComercial.objects.create(nombremarca=nombremarca)
+                messages.success(request, "Marca creada correctamente.")
+            except Exception as e:
+                # captura general de error de BD
+                messages.error(request, f"Ocurrió un error al crear: {str(e)}")
+            return redirect('admin_marcacomercial')
+
+        # --- EDITAR ---
+        if 'editar' in request.POST:
+            idmarca = request.POST.get('idmarca')
+            nombremarca = (request.POST.get('nombremarca') or '').strip()
+            if not nombremarca:
+                messages.error(request, "El nombre de la marca no puede estar vacío.")
+                return redirect('admin_marcacomercial')
+            try:
+                marca = get_object_or_404(MarcaComercial, pk=idmarca)
+                marca.nombremarca = nombremarca
+                marca.save()
+                messages.success(request, "Marca actualizada correctamente.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al actualizar: {str(e)}")
+            return redirect('admin_marcacomercial')
+
+        # --- ELIMINAR ---
+        if 'eliminar' in request.POST:
+            idmarca = request.POST.get('idmarca')
+            try:
+                marca = get_object_or_404(MarcaComercial, pk=idmarca)
+                # intentar eliminar en bloque try/except para controlar errores por FK
+                with transaction.atomic():
+                    marca.delete()
+                messages.success(request, "Marca eliminada correctamente.")
+            except ProtectedError:
+                messages.error(request, "No se puede eliminar la marca porque está referenciada en otro registro.")
+            except IntegrityError:
+                messages.error(request, "No se puede eliminar la marca por restricciones en la base de datos.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al eliminar: {str(e)}")
+            return redirect('admin_marcacomercial')
+
+    # GET -> mostrar lista
+    marcas = MarcaComercial.objects.all().order_by('idmarca')
+    context = {
+        'marcas': marcas,
+    }
+    return render(request, 'admin_marcacomercial.html', context)
+# ----------------------------------------

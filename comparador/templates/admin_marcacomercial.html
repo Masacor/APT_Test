@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrar MarcaComercial{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_marcacomercial.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container marcacomercial-container">
+    <h2>Marcas Comerciales</h2>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Formulario para crear nueva marca -->
+    <div class="card new-item">
+        <form method="post" class="form-inline">
+            {% csrf_token %}
+            <label for="nombremarca_new">Nueva marca:</label>
+            <input id="nombremarca_new" name="nombremarca" type="text" placeholder="Ingrese nombre de marca" required>
+            <button type="submit" name="agregar" class="btn">Guardar</button>
+            <button type="reset" class="btn btn-secondary">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- Tabla de marcas -->
+    {% if marcas %}
+    <table class="table-marcacomercial">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre de marca</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for marca in marcas %}
+            <tr data-id="{{ marca.idmarca }}">
+                <td class="cell-id">{{ marca.idmarca }}</td>
+
+                <!-- Celda con nombre y edición inline -->
+                <td class="cell-nombre">
+                    <span class="nombre-text">{{ marca.nombremarca }}</span>
+
+                    <form method="post" class="edit-mode" style="display:none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="idmarca" value="{{ marca.idmarca }}">
+                        <input name="nombremarca" class="input-inline" type="text"
+                               value="{{ marca.nombremarca }}" required>
+                        <button type="submit" name="editar" class="btn-icon save-inline" title="Guardar">💾</button>
+                        <button type="button" class="btn-icon cancel-inline" title="Cancelar">✕</button>
+                    </form>
+                </td>
+
+                <!-- Acciones: Editar / Eliminar -->
+                <td class="cell-actions">
+                    <button type="button" class="btn small edit-inline-trigger">Editar</button>
+
+                    <form method="post" class="form-delete" onsubmit="return confirm('¿Eliminar esta marca?');" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="idmarca" value="{{ marca.idmarca }}">
+                        <button type="submit" name="eliminar" class="btn btn-danger small">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">No hay marcas registradas.</div>
+    {% endif %}
+</div>
+
+<!-- Aquí llamamos al JS externo -->
+<script src="{% static 'js/admin_marcacomercial.js' %}"></script>
+{% endblock %}
