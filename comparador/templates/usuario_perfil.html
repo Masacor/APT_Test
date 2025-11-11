@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/usuario_perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container perfil-container">
+    <h2>Mi Perfil</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Nombre -->
+        <div class="perfil-item">
+            <label class="perfil-label">Nombre:</label>
+            <div class="perfil-valor">
+                <span id="nombre-texto">{{ usuario.nombre }}</span>
+                <input type="text" id="nombre-input" name="nombre" value="{{ usuario.nombre }}">
+                <button type="button" class="perfil-btn" onclick="habilitarEdicion('nombre')">Modificar</button>
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="perfil-item">
+            <label class="perfil-label">Email:</label>
+            <div class="perfil-valor">
+                <span id="email-texto">{{ usuario.email }}</span>
+                <input type="email" id="email-input" name="email" value="{{ usuario.email }}">
+                <button type="button" class="perfil-btn" onclick="habilitarEdicion('email')">Modificar</button>
+            </div>
+        </div>
+
+        <!-- Fecha de nacimiento -->
+        <div class="perfil-item">
+            <label class="perfil-label">Fecha de nacimiento:</label>
+            <div class="perfil-valor">
+                <!-- <span id="fecha-texto">{{ usuario.fechanacimiento|date:'d/m/Y' }}</span> -->
+                <span id="fecha-texto">{{ usuario.fechanacimiento|date:"d/m/Y"|default:"No registrado" }}</span>
+
+                <input type="date" id="fecha-input" name="fechanacimiento" value="{{ usuario.fechanacimiento|date:'Y-m-d' }}">
+                <button type="button" class="perfil-btn" onclick="habilitarEdicion('fecha')">Modificar</button>
+            </div>
+        </div>
+
+        <!-- Cambiar contraseña -->
+        <div class="perfil-item">
+            <label class="perfil-label">Contraseña:</label>
+            <div class="perfil-valor">
+                <span>********</span>
+                <button type="button" class="perfil-btn" onclick="mostrarCambioContrasena()">Cambiar contraseña</button>
+            </div>
+        </div>
+
+        <!-- Formulario cambio contraseña -->
+        <div id="cambio-contrasena">
+            <label>Contraseña actual:</label>
+            <input type="password" name="actual">
+
+            <label>Nueva contraseña:</label>
+            <input type="password" name="nueva">
+
+            <label>Confirmar nueva contraseña:</label>
+            <input type="password" name="confirmar">
+        </div>
+
+        <button type="submit" class="btn-guardar">Guardar cambios</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/usuario_perfil.js' %}"></script>
+{% endblock %}

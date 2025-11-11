@@ -1036,4 +1036,74 @@ def principioactivo(request):
 # --------------------------------
 
 # ----------------------- PrecioFarmacia
+# ----------------------------------------------------------------------------------------------------------
 
+
+# ----------------------- PERFIL DE USUARIO -----------------------
+def perfil_usuario(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    
+    usuario_id = request.session.get('usuario_id')
+    usuario = get_object_or_404(Usuario, idusuario=usuario_id)
+    
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        email = request.POST.get('email', '').strip()
+        fechanacimiento = request.POST.get('fechanacimiento', '').strip()
+
+        # Campos de cambio de contraseña
+        actual = request.POST.get('actual', '').strip()
+        nueva = request.POST.get('nueva', '').strip()
+        confirmar = request.POST.get('confirmar', '').strip()
+
+        # Validación básica de nombre/email
+        if not nombre or not email:
+            messages.error(request, "El nombre y el email son obligatorios.")
+            return render(request, 'usuario_perfil.html', {'usuario': usuario})
+
+        # Actualizar datos básicos
+        usuario.nombre = nombre
+        usuario.email = email
+        usuario.fechanacimiento = fechanacimiento or None
+
+        # Si se intentó cambiar la contraseña (al menos uno de los campos no vacío)
+        if actual or nueva or confirmar:
+            # Validaciones de formulario
+            if not actual or not nueva or not confirmar:
+                messages.error(request, "Para cambiar la contraseña debes completar los tres campos.")
+                return render(request, 'usuario_perfil.html', {'usuario': usuario})
+            if nueva != confirmar:
+                messages.error(request, "La nueva contraseña y su confirmación no coinciden.")
+                return render(request, 'usuario_perfil.html', {'usuario': usuario})
+
+            # Verificar contraseña actual.
+            # check_password funciona si la contraseña en DB está hasheada.
+            # Si por alguna razón la contraseña almacenada es texto plano,
+            # hacemos un fallback que compara directamente (para permitir el cambio).
+            try:
+                es_correcta = check_password(actual, usuario.contraseña or '')
+            except Exception:
+                # fallback seguro: comparar texto plano (por compatibilidad con DB antigua)
+                es_correcta = (usuario.contraseña == actual)
+
+            if not es_correcta:
+                messages.error(request, "La contraseña actual es incorrecta.")
+                return render(request, 'usuario_perfil.html', {'usuario': usuario})
+
+            # Asignar nuevo hash y guardar
+            usuario.contraseña = make_password(nueva)
+            messages.success(request, "Contraseña cambiada correctamente.")
+
+        # Guardar cambios (nombre, email, fecha y posible contraseña)
+        try:
+            usuario.save()
+            messages.success(request, "Datos actualizados correctamente.")
+        except Exception as e:
+            messages.error(request, f"No se pudieron guardar los cambios: {str(e)}")
+            # opcional: rollback o log
+
+        return redirect('perfil_usuario')
+
+    # GET
+    return render(request, 'usuario_perfil.html', {'usuario': usuario})

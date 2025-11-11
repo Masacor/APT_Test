@@ -14,6 +14,13 @@ urlpatterns = [
     path('detalle/<int:id>/', views.detalle_presentacion, name='detalle_presentacion'),
     path('medicamento/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
 
+    
+
+
+    # PERFIL USUARIO
+    path('perfil/', views.perfil_usuario, name='perfil_usuario'),
+
+
 
 
 

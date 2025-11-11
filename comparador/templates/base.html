@@ -20,7 +20,9 @@
                     <a href="{% url 'buscador_prueba' %}">Buscador</a>
 
                     {% if request.session.usuario_id %}
-                    <span>Hola, {{ request.session.usuario_nombre }}</span>
+                    <!-- <span>Hola, {{ request.session.usuario_nombre }}</span> -->
+                    <a href="{% url 'perfil_usuario' %}" class="perfil-link">Hola, {{ request.session.usuario_nombre }}</a>
+
                     <a href="{% url 'logout' %}" class="logout-link">Cerrar Sesión</a>
                     {% else %}
                     <a href="{% url 'login' %}" class="login-link">Iniciar Sesión</a>
