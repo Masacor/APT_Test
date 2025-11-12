@@ -4,10 +4,10 @@ from django.contrib.auth import authenticate, login as auth_login  # login
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password# Para sign up
 import re # Para sign up
-from datetime import datetime # Para sign up
-from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion
+from datetime import datetime, date # Para sign up
+from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion, Guardado
 from django.db.models import Min, Max
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 
@@ -404,6 +404,8 @@ def informacion_presentacion(request, descripcion):
     }
     return render(request, 'informacion_presentacion.html', context)
 
+
+''''''
 def detalle_presentacion(request, id):
     """Mostrar detalle de una presentación por su id (idpresentacion).
 
@@ -461,6 +463,150 @@ def detalle_presentacion(request, id):
     }
 
     return render(request, 'detalle_presentacion.html', context)
+''''''
+def detalle_presentacion(request, id):
+    """Mostrar detalle de una presentación por su id (idpresentacion).
+
+    Antes la vista intentaba buscar por `slug` pero el modelo de
+    `Presentacion` no define un campo `slug`. Aquí usamos el PK
+    `idpresentacion` para garantizar que la vista funcione con los
+    registros existentes.
+    """
+    presentacion = get_object_or_404(Presentacion, pk=id)
+
+    # Datos del medicamento relacionado (si existe)
+    medicamento = presentacion.idmedicamento
+    marca = None
+    laboratorio = None
+    principios = PrincipioActivo.objects.none()
+    
+    # Intentar obtener marca y laboratorio del medicamento
+    if medicamento:
+        marca = medicamento.idmarca
+        laboratorio = medicamento.idlaboratorio
+        # Principios activos asociados al medicamento
+        principios = PrincipioActivo.objects.filter(medicamentoprincipio__idmedicamento=medicamento).distinct()
+    
+    # Si no hay marca/laboratorio en medicamento, obtenerlos de la tabla presentacion directamente
+    if not marca or not laboratorio:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT idmarca, idlaboratorio FROM presentacion WHERE idpresentacion = %s",
+                [id]
+            )
+            row = cursor.fetchone()
+            if row and row[0]:  # Si hay idmarca
+                marca = MarcaComercial.objects.filter(pk=row[0]).first()
+            if row and row[1]:  # Si hay idlaboratorio
+                laboratorio = Laboratorio.objects.filter(pk=row[1]).first()
+
+    # Precios asociados - obtener TODOS los precios, no agrupados
+    precios = PrecioFarmacia.objects.filter(
+        idpresentacion=presentacion
+    ).select_related('idfarmacia').order_by('precio')
+
+    context = {
+        'presentacion': presentacion,
+        'medicamento': medicamento,
+        'marca': marca,
+        'laboratorio': laboratorio,
+        'principios': principios,
+        'precios': precios,
+    }
+
+    # Indicador de usuario logueado (se establece en login_usuario)
+    context['user_logged'] = bool(request.session.get('usuario_id'))
+    
+    # Verificar si el usuario ya tiene guardada esta presentación
+    if context['user_logged']:
+        usuario_id = request.session.get('usuario_id')
+        try:
+            usuario = Usuario.objects.get(pk=usuario_id)
+            context['is_saved'] = Guardado.objects.filter(
+                idusuario=usuario,
+                idpresentacion=presentacion
+            ).exists()
+        except Usuario.DoesNotExist:
+            context['is_saved'] = False
+    else:
+        context['is_saved'] = False
+
+    return render(request, 'detalle_presentacion.html', context)
+
+
+
+
+
+
+#------------------------------ BOTON DE GUARDAR MEDICAMENTOS
+def guardar_presentacion(request):
+    """Endpoint POST para guardar o eliminar una presentación (crear/borrar Guardado)."""
+    if request.method == 'POST':
+        usuario_id = request.session.get('usuario_id')
+        presentacion_id = request.POST.get('presentacion_id')
+        
+        # Validar que el usuario esté logueado
+        if not usuario_id:
+            return JsonResponse({'success': False, 'message': 'Usuario no logueado'}, status=401)
+        
+        # Validar que la presentación exista
+        try:
+            presentacion = Presentacion.objects.get(pk=presentacion_id)
+        except Presentacion.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Presentación no encontrada'}, status=404)
+        
+        # Obtener el usuario
+        try:
+            usuario = Usuario.objects.get(pk=usuario_id)
+        except Usuario.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Usuario no encontrado'}, status=404)
+        
+        # Verificar si ya existe un guardado
+        guardado_existente = Guardado.objects.filter(
+            idusuario=usuario,
+            idpresentacion=presentacion
+        ).first()
+        
+        if guardado_existente:
+            # Si existe, lo eliminamos (desmarcar)
+            guardado_existente.delete()
+            return JsonResponse({
+                'success': True, 
+                'message': 'Presentación removida de guardados',
+                'action': 'removed'
+            })
+        else:
+            # Si no existe, lo creamos (marcar)
+            try:
+                guardado = Guardado.objects.create(
+                    idusuario=usuario,
+                    idpresentacion=presentacion,
+                    fechaagregado=date.today()
+                )
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Presentación guardada correctamente',
+                    'action': 'saved',
+                    'guardado_id': guardado.idguardado
+                })
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': f'Error al guardar: {str(e)}'}, status=500)
+    
+    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

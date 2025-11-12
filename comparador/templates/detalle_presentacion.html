@@ -3,134 +3,631 @@
 {% block title %}Detalle - {{ presentacion.descripcion }}{% endblock %}
 
 {% block content %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <style>
-/* Estilo coherente con buscador_prueba */
-.detail-container {
-	max-width: 1000px;
-	margin: 24px auto;
-	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-	overflow: hidden;
-	display: grid;
-	grid-template-columns: 360px 1fr;
+/* Diseño SoloTodo - Imagen izquierda, tarjetas precios derecha */
+.detail-wrapper {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 20px 16px;
 }
-.detail-image {
-	padding: 20px;
+
+.breadcrumb {
+	margin-bottom: 24px;
+}
+
+.breadcrumb a {
+	color: #0066cc;
+	text-decoration: none;
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.breadcrumb a:hover {
+	text-decoration: underline;
+}
+
+.detail-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 32px;
+	align-items: start;
+}
+
+/* COLUMNA IZQUIERDA - Imagen y descripción */
+.detail-left {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.detail-image-container {
+	background: #f5f5f5;
+	border-radius: 12px;
+	padding: 40px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+	min-height: 400px;
+	position: relative;
+	overflow: hidden;
 }
-.detail-image img { max-width: 100%; max-height: 320px; object-fit: contain; }
-.detail-main { padding: 22px; }
-.detail-title { font-size: 20px; margin-bottom: 8px; color: #222; }
-.meta { color: #555; font-size: 14px; margin-bottom: 12px; }
-.section { margin-top: 16px; }
-.prices-list { display: grid; gap: 10px; }
-.price-row { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 12px 16px; 
-    border-radius: 8px; 
-    background: #f7f9fb;
+
+.detail-image-container img {
+	max-width: 100%;
+	max-height: 380px;
+	object-fit: contain;
+}
+
+.detail-description {
+	background: white;
+	border-radius: 12px;
+	padding: 20px;
+	border: 1px solid #e0e0e0;
+}
+
+.detail-description h2 {
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0 0 12px 0;
+	color: #222;
+}
+
+/* Título con acciones (campana) */
+.detail-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 12px;
+}
+
+.btn-bell {
+	background: transparent;
+	border: 1px solid #e0e0e0;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background 0.12s ease, transform 0.08s ease;
+}
+
+.btn-bell:hover {
+	background: #f1f5f9;
+	transform: translateY(-2px);
+}
+
+.btn-bell .bell-icon {
+	font-size: 16px;
+	color: #333;
+}
+
+/* Campana sobre la imagen */
+.image-bell {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #e0e0e0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: all 0.2s ease;
 }
-.price-row:hover {
-    background: #f0f4f8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.price-row .left { 
-    font-size: 14px; 
-    color: #333;
-    flex: 1;
-    margin-right: 16px;
-}
-.price-row .right { 
-    font-weight: 700; 
-    color: #007bff;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.cta { margin-top:18px; }
-.btn-primary { background:#007bff; color:#fff; padding:10px 14px; border-radius:8px; text-decoration:none }
-.back-link { color:#666; text-decoration:none; font-size:14px }
 
-@media (max-width:900px){
-	.detail-container{ grid-template-columns: 1fr; }
-	.detail-image{ padding:14px }
+.image-bell:hover:not(:disabled) {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+.image-bell.saved {
+    background: #e8f4f8;
+    border-color: #0066cc;
+}
+
+.image-bell.saved:hover {
+    background: #d4e8f4;
+    transform: translateY(-2px);
+}
+
+.image-bell .bell-icon { font-size: 16px; }.detail-description .meta {
+	font-size: 14px;
+	color: #666;
+	margin: 0 0 16px 0;
+}
+
+.detail-description .meta strong {
+	color: #333;
+}
+
+.detail-description h4 {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 16px 0 8px 0;
+	color: #222;
+}
+
+.detail-description ul {
+	margin: 0;
+	padding-left: 20px;
+	font-size: 14px;
+	color: #555;
+	line-height: 1.6;
+}
+
+.detail-description ul li {
+	margin-bottom: 6px;
+}
+
+/* COLUMNA DERECHA - Tarjetas de precios */
+.detail-right {
+	position: sticky;
+	top: 100px;
+}
+
+.prices-header {
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 16px;
+	color: #222;
+}
+
+.prices-container {
+	display: grid;
+	gap: 16px;
+}
+
+.price-card {
+	background: white;
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	padding: 14px;
+	transition: all 0.3s ease;
+	position: relative;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
+
+.price-card:hover {
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	border-color: #0066cc;
+	transform: translateY(-4px);
+}
+
+.price-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 8px;
+}
+
+.pharmacy-name {
+	font-weight: 600;
+	font-size: 15px;
+	color: #222;
+	margin: 0;
+}
+
+.price-badge {
+	background: #0066cc;
+	color: white;
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 700;
+	display: inline-block;
+}
+
+.price-card-meta {
+	display: grid;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.meta-item {
+	font-size: 12px;
+	color: #666;
+	display: flex;
+	justify-content: space-between;
+}
+
+.meta-item strong {
+	color: #333;
+}
+
+.divider {
+	height: 1px;
+	background: #e0e0e0;
+	margin: 10px 0;
+}
+
+.price-card-footer {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.btn-primary {
+	flex: 1;
+	background: #0066cc;
+	color: white;
+	padding: 12px 16px;
+	border-radius: 8px;
+	text-decoration: none;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 600;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+	background: #0052a3;
+	transform: scale(1.02);
+}
+
+.back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: #0066cc;
+	text-decoration: none;
+	font-size: 14px;
+	margin-bottom: 20px;
+	transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+	color: #0052a3;
+}
+
+/* Acciones debajo de la descripción: tarjeta completa */
+.detail-action-card {
+	background: white;
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	padding: 12px;
+	margin-top: 14px;
+}
+
+.detail-action-content {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.detail-action-btn {
+	background: #0066cc;
+	color: #fff;
+	border: none;
+	padding: 10px 16px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.08s ease;
+	width: 100%;
+}
+
+.detail-action-btn:hover {
+	background: #0052a3;
+	transform: translateY(-2px);
+}
+
+.no-prices {
+	background: #fff9e6;
+	border: 1px solid #ffe58f;
+	border-radius: 8px;
+	padding: 16px;
+	color: #666;
+	text-align: center;
+	font-size: 14px;
+}
+
+.update-date {
+	font-size: 12px;
+	color: #999;
+	margin-top: 8px;
+	font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+	.detail-container {
+		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+	
+	.detail-right {
+		position: static;
+	}
+	
+	.prices-container {
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	}
+}
+
+@media (max-width: 768px) {
+	.detail-wrapper {
+		padding: 16px;
+	}
+	
+	.detail-container {
+		gap: 16px;
+	}
+	
+	.detail-image-container {
+		min-height: 300px;
+		padding: 30px;
+	}
+	
+	.detail-image-container img {
+		max-height: 280px;
+	}
+	
+	.prices-container {
+		grid-template-columns: 1fr;
+	}
 }
 </style>
 
-<div style="max-width:1100px; margin:20px auto; padding:0 16px;">
-	<a href="{% url 'buscador_prueba' %}" class="back-link">← Volver al buscador</a>
+<div class="detail-wrapper">
+	<a href="{% url 'buscador_prueba' %}" class="back-btn">
+		<span>←</span>
+		<span>Volver al buscador</span>
+	</a>
+
 	<div class="detail-container">
-		<div class="detail-image">
-			{% if medicamento and medicamento.url_foto %}
-				<img src="{{ medicamento.url_foto }}" alt="{{ presentacion.descripcion }}">
-			{% else %}
-				<img src="/static/img/default_medicamento.png" alt="{{ presentacion.descripcion }}">
-			{% endif %}
+		<!-- COLUMNA IZQUIERDA: Imagen y Descripción -->
+		<div class="detail-left">
+			<!-- Imagen del medicamento -->
+			<div class="detail-image-container">
+				{% if medicamento and medicamento.url_foto %}
+					<img src="{{ medicamento.url_foto }}" alt="{{ presentacion.descripcion }}">
+				{% else %}
+					<img src="/static/img/default_medicamento.png" alt="{{ presentacion.descripcion }}">
+				{% endif %}
+
+				{# Campana superpuesta sobre la imagen (visible solo si hay usuario logueado) #}
+				{% if user_logged %}
+					<button class="image-bell {% if is_saved %}saved{% endif %}" 
+					        data-saved="{% if is_saved %}true{% else %}false{% endif %}"
+					        title="{% if is_saved %}Eliminar de guardados{% else %}Guardar presentación{% endif %}" 
+					        type="button">
+						<span class="bell-icon">🔔</span>
+					</button>
+				{% endif %}
+			</div>
+
+			<!-- Descripción del medicamento -->
+			<div class="detail-description">
+				<div class="detail-title-row">
+					<h2 style="margin:0">{{ presentacion.descripcion }} {% if presentacion.cantidadvalor %}<br><span style="font-size: 16px; font-weight: 400; color: #666;">({{ presentacion.cantidadvalor }} {{ presentacion.cantidadunidad }})</span>{% endif %}</h2>
+					<!-- bell moved to image corner -->
+				</div>
+				<div class="meta">
+					{% if marca %}<strong>Marca:</strong> {{ marca.nombremarca }}<br>{% endif %}
+					{% if laboratorio %}<strong>Laboratorio:</strong> {{ laboratorio.nombrelaboratorio }}{% endif %}
+				</div>
+
+				<div>
+					<h4>Principio(s) activo(s)</h4>
+					{% if principios.exists %}
+						<ul>
+							{% for principio in principios %}
+								<li>{{ principio.nombre }}</li>
+							{% endfor %}
+						</ul>
+					{% else %}
+						<p style="font-size: 14px; color: #999;">No se encontró información de principios activos.</p>
+					{% endif %}
+				</div>
+
+				<!-- Acciones: tarjeta con botón debajo de la descripción -->
+				<div class="detail-action-card">
+					<div class="detail-action-content">
+						<div style="flex:1">
+							<div style="font-weight:600; color:#222;">NADA</div>
+							<div style="font-size:13px; color:#666">NADA</div>
+						</div>
+						<div style="width:140px">
+							<button class="detail-action-btn" type="button">NADA</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
-		<div class="detail-main">
-			<div class="detail-title">{{ presentacion.descripcion }} {% if presentacion.cantidadvalor %} ({{ presentacion.cantidadvalor }} {{ presentacion.cantidadunidad }}){% endif %}</div>
-			<div class="meta">
-				{% if marca %}<strong>Marca:</strong> {{ marca.nombremarca }} • {% endif %}
-				{% if laboratorio %}<strong>Laboratorio:</strong> {{ laboratorio.nombrelaboratorio }}{% endif %}
-			</div>
+		<!-- COLUMNA DERECHA: Tarjetas de Precios -->
+		<div class="detail-right">
+			<div class="prices-header">💰 Precios disponibles</div>
+			
+			{% if precios %}
+				<div class="prices-container">
+					{% for precio in precios %}
+						{% if precio.presentacionurl %}
+							<a href="{{ precio.presentacionurl }}" target="_blank" class="price-card">
+						{% elif precio.idfarmacia.url %}
+							<a href="{{ precio.idfarmacia.url }}" target="_blank" class="price-card">
+						{% else %}
+							<div class="price-card">
+						{% endif %}
+							<div class="price-card-header">
+								<h3 class="pharmacy-name">{{ precio.idfarmacia.nombrefarmacia }} - {{ marca.nombremarca|default:"Genérico" }}</h3>
+							</div>
 
-			<div class="section">
-				<h4>Principio(s) activo(s)</h4>
-				{% if principios.exists %}
-					<ul>
-						{% for principio in principios %}
-							<li>{{ principio.nombre }}</li>
-						{% endfor %}
-					</ul>
-				{% else %}
-					<p class="meta">No se encontró información de principios activos.</p>
-				{% endif %}
-			</div>
-
-			<div class="section">
-				<h4>Precios disponibles</h4>
-				{% if precios %}
-					<div class="prices-list">
-						{% for precio in precios %}
-							<div class="price-row">
-								<div class="left">
-									<div style="font-weight:600">
-										{{ precio.idfarmacia.nombrefarmacia }} - 
-										{{ laboratorio.nombrelaboratorio }} - 
-										{{ marca.nombremarca|default:"Genérico" }}
-									</div>
-									<div style="font-size:12px; color:#666">Actualizado: {{ precio.fecharegistro }}</div>
+							<div class="price-card-meta">
+								<div class="meta-item">
+									<strong>Laboratorio:</strong>
+									<span>{{ laboratorio.nombrelaboratorio }}</span>
 								</div>
-								<div class="right">
-									${{ precio.precio }}
-									{% if precio.presentacionurl %}
-										<a href="{{ precio.presentacionurl }}" target="_blank" class="btn-primary" style="margin-left:12px; padding:6px 10px; font-size:13px">Ir a la farmacia</a>
-									{% elif precio.idfarmacia.url %}
-										<a href="{{ precio.idfarmacia.url }}" target="_blank" class="btn-primary" style="margin-left:12px; padding:6px 10px; font-size:13px">Ir a la farmacia</a>
-									{% endif %}
+								<div class="meta-item">
+									<strong>Actualizado:</strong>
+									<span>{{ precio.fecharegistro }}</span>
 								</div>
 							</div>
-						{% endfor %}
-					</div>
-				{% else %}
-					<p class="meta">No hay precios registrados para esta presentación.</p>
-				{% endif %}
-			</div>
 
-			<div class="cta">
-				<a href="{% url 'buscador_prueba' %}" class="btn-primary">Seguir buscando</a>
-			</div>
+							<div class="divider"></div>
+
+							<div>
+								<div class="price-badge">${{ precio.precio }}</div>
+							</div>
+						{% if precio.presentacionurl or precio.idfarmacia.url %}
+							</a>
+						{% else %}
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="no-prices">
+					📦 No hay precios registrados para esta presentación.
+				</div>
+			{% endif %}
 		</div>
 	</div>
 </div>
+
+<script>
+// Manejo del botón de campana para guardar/eliminar presentación
+document.addEventListener('DOMContentLoaded', function() {
+	const bellButton = document.querySelector('.image-bell');
+	if (!bellButton) return;
+
+	const presentacionId = parseInt('{{ presentacion.idpresentacion }}');
+	const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+	const guardarUrl = '{% url "guardar_presentacion" %}';
+
+	// Leer estado inicial desde atributo data-saved
+	let isSaved = bellButton.getAttribute('data-saved') === 'true';
+	let isProcessing = false;
+
+	function updateButtonState(saved) {
+		isSaved = saved;
+		if (saved) {
+			bellButton.classList.add('saved');
+			bellButton.title = 'Eliminar de guardados';
+		} else {
+			bellButton.classList.remove('saved');
+			bellButton.title = 'Guardar presentación';
+		}
+	}
+
+	bellButton.addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		// Evitar múltiples peticiones simultáneas
+		if (isProcessing) return;
+		isProcessing = true;
+		bellButton.style.opacity = '0.6';
+
+		const formData = new FormData();
+		formData.append('presentacion_id', presentacionId);
+
+		fetch(guardarUrl, {
+			method: 'POST',
+			headers: {
+				'X-CSRFToken': csrfToken
+			},
+			body: formData
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				if (data.action === 'saved') {
+					updateButtonState(true);
+					showNotification('¡Presentación guardada correctamente!', 'success');
+				} else if (data.action === 'removed') {
+					updateButtonState(false);
+					showNotification('Presentación removida de guardados', 'info');
+				}
+			} else {
+				showNotification('Error: ' + data.message, 'error');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			showNotification('Error al procesar la presentación', 'error');
+		})
+		.finally(() => {
+			isProcessing = false;
+			bellButton.style.opacity = '1';
+		});
+	});
+
+	function showNotification(message, type) {
+		// Crear notificación simple (puede mejorarse con toast library)
+		const notification = document.createElement('div');
+		notification.textContent = message;
+		notification.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 12px 20px;
+			border-radius: 8px;
+			font-size: 14px;
+			z-index: 1000;
+			animation: slideIn 0.3s ease;
+		`;
+		
+		if (type === 'success') {
+			notification.style.background = '#4caf50';
+			notification.style.color = 'white';
+		} else if (type === 'error') {
+			notification.style.background = '#f44336';
+			notification.style.color = 'white';
+		} else {
+			notification.style.background = '#2196f3';
+			notification.style.color = 'white';
+		}
+		
+		document.body.appendChild(notification);
+		
+		setTimeout(() => {
+			notification.style.animation = 'slideOut 0.3s ease';
+			setTimeout(() => notification.remove(), 300);
+		}, 3000);
+	}
+
+	// Agregar animaciones CSS dinámicamente
+	const style = document.createElement('style');
+	style.textContent = `
+		@keyframes slideIn {
+			from {
+				transform: translateX(400px);
+				opacity: 0;
+			}
+			to {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+		@keyframes slideOut {
+			from {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			to {
+				transform: translateX(400px);
+				opacity: 0;
+			}
+		}
+	`;
+	document.head.appendChild(style);
+});
+</script>
 
 {% endblock %}

@@ -12,6 +12,7 @@ urlpatterns = [
     path('presentacion/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
     # Detalle de presentación (por id)
     path('detalle/<int:id>/', views.detalle_presentacion, name='detalle_presentacion'),
+    path('guardar-presentacion/', views.guardar_presentacion, name='guardar_presentacion'),
     path('medicamento/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
 
     
