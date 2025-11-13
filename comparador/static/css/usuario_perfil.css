@@ -28,10 +28,11 @@ h2 {
 .perfil-valor {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
     background: #f7f7f7;
     border-radius: 6px;
     padding: 10px 15px;
+    justify-content: space-between;
 }
 
 .perfil-valor input {
@@ -39,11 +40,14 @@ h2 {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    display: none;
+}
+
+.perfil-input-hidden {
+    display: none !important;
 }
 
 .perfil-valor span {
-    flex-grow: 1;
+    min-width: 100px;
 }
 
 .perfil-btn {
@@ -52,9 +56,11 @@ h2 {
     border: none;
     border-radius: 6px;
     padding: 6px 12px;
-    margin-left: 10px;
     cursor: pointer;
     transition: 0.3s;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-left: auto;
 }
 
 .perfil-btn:hover {

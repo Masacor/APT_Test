@@ -277,31 +277,8 @@ def logout(request):
     return redirect('index')
 
 # ---------------------------------------------------
-"""
-def buscador_prueba(request):
-    query = request.GET.get('q', '').strip()
-    resultados = []
 
-    if query:
-        # Filtrar presentaciones que contengan la búsqueda
-        presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
 
-        for p in presentaciones:
-            # Obtener todos los precios asociados a esta presentación
-            precios = PrecioFarmacia.objects.filter(idpresentacion=p)
-            if precios.exists():
-                resultados.append({
-                    'presentacion': p,
-                    'farmacias': precios.order_by('precio')  # opcional: ordena por precio ascendente
-                })
-
-    context = {
-        'query': query,
-        'resultados': resultados
-    }
-    return render(request, 'buscador_prueba.html', context)
-
-"""
 def buscador_prueba(request):
     query = request.GET.get('q', '').strip()
     filtros_marcas = request.GET.getlist('marca')
@@ -405,7 +382,7 @@ def informacion_presentacion(request, descripcion):
     return render(request, 'informacion_presentacion.html', context)
 
 
-''''''
+'''
 def detalle_presentacion(request, id):
     """Mostrar detalle de una presentación por su id (idpresentacion).
 
@@ -463,7 +440,7 @@ def detalle_presentacion(request, id):
     }
 
     return render(request, 'detalle_presentacion.html', context)
-''''''
+'''
 def detalle_presentacion(request, id):
     """Mostrar detalle de una presentación por su id (idpresentacion).
 
@@ -652,43 +629,6 @@ def guardar_presentacion(request):
 
 
 # --------------------- CRUDS de todo
-
-# -------------------- Usuario
-# def admin_dashboard(request):
-#     if not request.session.get('is_admin'):
-#         return redirect('login')
-
-#     # Crear usuario
-#     if request.method == 'POST' and 'crear' in request.POST:
-#         nombre = request.POST['nombre']
-#         correo = request.POST['correo']
-#         contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-#         Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
-#         return redirect('admin_dashboard')
-
-#     # Editar usuario
-#     if request.method == 'POST' and 'editar' in request.POST:
-#         usuario_id = request.POST['usuario_id']
-#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-#         usuario.nombre = request.POST['nombre']
-#         usuario.email = request.POST['correo']
-#         if request.POST['contraseña']:
-#             usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-#         usuario.save()
-#         return redirect('admin_dashboard')
-
-#     # Eliminar usuario
-#     if request.method == 'POST' and 'eliminar' in request.POST:
-#         usuario_id = request.POST['usuario_id']
-#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-#         usuario.delete()
-#         return redirect('admin_dashboard')
-
-
-#     # Listar usuarios
-#     usuarios = Usuario.objects.all()
-#     return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
-
 
 # ----------------------- DASHBOARD
 def admin_dashboard(request):
@@ -1252,4 +1192,70 @@ def perfil_usuario(request):
         return redirect('perfil_usuario')
 
     # GET
-    return render(request, 'usuario_perfil.html', {'usuario': usuario})
+    # Obtener presentaciones guardadas por el usuario
+    guardados = Guardado.objects.filter(idusuario=usuario).select_related(
+        'idpresentacion',
+        'idpresentacion__idmedicamento',
+    ).order_by('-fechaagregado')
+
+    return render(request, 'usuario_perfil.html', {
+        'usuario': usuario,
+        'guardados': guardados,
+    })
+# ----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+# ------------------------ GRAFICOS DE PRUEBA
+from django.shortcuts import render
+from django.db.models import Count
+from datetime import date
+from .models import Usuario
+import json
+
+def admin_usuario_graficos(request):
+    usuarios = Usuario.objects.all()
+
+    # -------------------- Edad de los usuarios --------------------
+    edad_dict = {}
+    today = date.today()
+    for u in usuarios:
+        if u.fechanacimiento:
+            edad = today.year - u.fechanacimiento.year
+            edad_dict[edad] = edad_dict.get(edad, 0) + 1
+
+    # Ordenar edades ascendente
+    edad_labels = sorted(edad_dict.keys())
+    edad_values = [edad_dict[edad] for edad in edad_labels]
+
+    # -------------------- Registro por fecha --------------------
+    registro_dict = {}
+    for u in usuarios:
+        fecha = u.fecharegistro.strftime('%Y-%m-%d')
+        registro_dict[fecha] = registro_dict.get(fecha, 0) + 1
+
+    # Ordenar por fecha cronológicamente
+    registro_labels = sorted(registro_dict.keys())
+    registro_values = [registro_dict[fecha] for fecha in registro_labels]
+
+    # -------------------- Usuarios por comuna --------------------
+    comuna_dict = usuarios.values('idcomuna__nombrecomuna').annotate(count=Count('idusuario'))
+    # Ordenar por cantidad descendente
+    comuna_sorted = sorted(comuna_dict, key=lambda x: x['count'], reverse=True)
+    comuna_labels = [c['idcomuna__nombrecomuna'] if c['idcomuna__nombrecomuna'] else 'Sin comuna' for c in comuna_sorted]
+    comuna_values = [c['count'] for c in comuna_sorted]
+
+    # -------------------- Contexto para la plantilla --------------------
+    context = {
+        'edadData': json.dumps({'labels': edad_labels, 'data': edad_values}),
+        'registroData': json.dumps({'labels': registro_labels, 'data': registro_values}),
+        'comunaData': json.dumps({'labels': comuna_labels, 'data': comuna_values}),
+    }
+
+    return render(request, 'admin_usuario_graficos.html', context)

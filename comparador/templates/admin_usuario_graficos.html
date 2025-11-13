@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gráficos de Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_usuario_graficos.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="graficos-container">
+    <h1>Estadísticas de Usuarios</h1>
+
+    <div class="chart-card">
+        <h3>Usuarios por edad</h3>
+        <canvas id="edadChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Usuarios por fecha de registro</h3>
+        <canvas id="registroChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Usuarios por comuna</h3>
+        <canvas id="comunaChart"></canvas>
+    </div>
+</div>
+
+<!-- Datos desde Django -->
+<script type="application/json" id="edadData">{{ edadData|safe }}</script>
+<script type="application/json" id="registroData">{{ registroData|safe }}</script>
+<script type="application/json" id="comunaData">{{ comunaData|safe }}</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/admin_usuario_graficos.js' %}"></script>
+{% endblock %}

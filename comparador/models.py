@@ -410,7 +410,7 @@ class Usuario(models.Model):
     proveedoroauth = models.CharField(max_length=255, blank=True, null=True)
     idproveedor = models.CharField(max_length=255, blank=True, null=True)
 
-    # 🔄 Cambio importante: ahora es una ForeignKey
+    #  Cambio importante: ahora es una ForeignKey
     idcomuna = models.ForeignKey(
         'Comuna',
         on_delete=models.DO_NOTHING,

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views 
 
 urlpatterns = [
     path('buscadorprueba/', views.index, name='index'),
@@ -15,7 +15,6 @@ urlpatterns = [
     path('guardar-presentacion/', views.guardar_presentacion, name='guardar_presentacion'),
     path('medicamento/<str:descripcion>/', views.informacion_presentacion, name='informacion_presentacion'),
 
-    
 
 
     # PERFIL USUARIO
@@ -53,6 +52,11 @@ urlpatterns = [
     path('dashboard/principioactivo/', views.principioactivo, name='admin_principioactivo'),
 
 
+    # GRAFICOS USUARIOS
+    path('dashboard/usuarios/graficos/', views.admin_usuario_graficos, name='admin_usuario_graficos'),
+
+
+
 
     # LOS QUE FALTAN
     # MEDICAMENTO_PRINCIPIO
@@ -65,3 +69,11 @@ urlpatterns = [
     # path('dashboard/preciofarmacia/', views.preciofarmacia, name='admin_preciofarmacia'),
 
 ]
+
+
+
+
+
+
+
+    

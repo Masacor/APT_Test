@@ -25,7 +25,7 @@
             <label class="perfil-label">Nombre:</label>
             <div class="perfil-valor">
                 <span id="nombre-texto">{{ usuario.nombre }}</span>
-                <input type="text" id="nombre-input" name="nombre" value="{{ usuario.nombre }}">
+                <input type="text" id="nombre-input" name="nombre" value="{{ usuario.nombre }}" class="perfil-input-hidden">
                 <button type="button" class="perfil-btn" onclick="habilitarEdicion('nombre')">Modificar</button>
             </div>
         </div>
@@ -35,7 +35,7 @@
             <label class="perfil-label">Email:</label>
             <div class="perfil-valor">
                 <span id="email-texto">{{ usuario.email }}</span>
-                <input type="email" id="email-input" name="email" value="{{ usuario.email }}">
+                <input type="email" id="email-input" name="email" value="{{ usuario.email }}" class="perfil-input-hidden">
                 <button type="button" class="perfil-btn" onclick="habilitarEdicion('email')">Modificar</button>
             </div>
         </div>
@@ -47,7 +47,7 @@
                 <!-- <span id="fecha-texto">{{ usuario.fechanacimiento|date:'d/m/Y' }}</span> -->
                 <span id="fecha-texto">{{ usuario.fechanacimiento|date:"d/m/Y"|default:"No registrado" }}</span>
 
-                <input type="date" id="fecha-input" name="fechanacimiento" value="{{ usuario.fechanacimiento|date:'Y-m-d' }}">
+                <input type="date" id="fecha-input" name="fechanacimiento" value="{{ usuario.fechanacimiento|date:'Y-m-d' }}" class="perfil-input-hidden">
                 <button type="button" class="perfil-btn" onclick="habilitarEdicion('fecha')">Modificar</button>
             </div>
         </div>
