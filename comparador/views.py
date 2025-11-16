@@ -483,6 +483,21 @@ def detalle_presentacion(request, id):
         idpresentacion=presentacion
     ).select_related('idfarmacia').order_by('precio')
 
+    # RECOMENDADOS: Presentaciones que comparten PRINCIPIO(S) activos
+    recomendados = []
+    try:
+        # obtener ids de principios asociados a este presentacion (vía medicamento)
+        principios_ids = PrincipioActivo.objects.filter(
+            medicamentoprincipio__idmedicamento=medicamento
+        ).values_list('idprincipio', flat=True)
+
+        if principios_ids:
+            recomendados = Presentacion.objects.filter(
+                idmedicamento__medicamentoprincipio__idprincipio__in=principios_ids
+            ).exclude(idpresentacion=presentacion.idpresentacion).distinct().select_related('idmedicamento__idmarca')[:8]
+    except Exception:
+        recomendados = []
+
     context = {
         'presentacion': presentacion,
         'medicamento': medicamento,
@@ -490,6 +505,7 @@ def detalle_presentacion(request, id):
         'laboratorio': laboratorio,
         'principios': principios,
         'precios': precios,
+        'recomendados': recomendados,
     }
 
     # Indicador de usuario logueado (se establece en login_usuario)
@@ -1201,6 +1217,34 @@ def perfil_usuario(request):
     return render(request, 'usuario_perfil.html', {
         'usuario': usuario,
         'guardados': guardados,
+    })
+
+
+def guaradados(request):
+    """Mostrar los guardados del usuario en forma de tarjetas.
+
+    Requiere sesión activa; si no hay usuario logueado redirige a `login`.
+    """
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    usuario_id = request.session.get('usuario_id')
+    try:
+        usuario = Usuario.objects.get(pk=usuario_id)
+    except Usuario.DoesNotExist:
+        return redirect('login')
+
+    # Traer guardados con relaciones para evitar consultas N+1
+    guardados = Guardado.objects.filter(idusuario=usuario).select_related(
+        'idpresentacion',
+        'idpresentacion__idmedicamento',
+        'idpresentacion__idmedicamento__idmarca',
+        'idpresentacion__idmedicamento__idlaboratorio'
+    ).order_by('-fechaagregado')
+
+    return render(request, 'guaradados.html', {
+        'guardados': guardados,
+        'usuario': usuario,
     })
 # ----------------------------------------------------------
 

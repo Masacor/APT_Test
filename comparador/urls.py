@@ -19,6 +19,7 @@ urlpatterns = [
 
     # PERFIL USUARIO
     path('perfil/', views.perfil_usuario, name='perfil_usuario'),
+    path('guaradados/', views.guaradados, name='guaradados'),
 
 
 

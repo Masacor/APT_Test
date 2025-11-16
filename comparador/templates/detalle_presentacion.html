@@ -295,38 +295,25 @@
 	color: #0052a3;
 }
 
-/* Acciones debajo de la descripción: tarjeta completa */
-.detail-action-card {
-	background: white;
-	border: 1px solid #e0e0e0;
-	border-radius: 12px;
-	padding: 12px;
-	margin-top: 14px;
-}
+/* Acciones debajo de la descripción: (recomendados styles) */
 
-.detail-action-content {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.detail-action-btn {
-	background: #0066cc;
-	color: #fff;
-	border: none;
-	padding: 10px 16px;
-	border-radius: 8px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: background 0.15s ease, transform 0.08s ease;
-	width: 100%;
-}
-
-.detail-action-btn:hover {
-	background: #0052a3;
-	transform: translateY(-2px);
-}
-
+		.reco-bar {
+			background: #f9f9f9;
+			padding: 24px 0;
+			margin-top: 40px;
+			border-top: 1px solid #e0e0e0;
+			border-bottom: 1px solid #e0e0e0;
+		}
+		.reco-container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+		.reco-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #222; }
+		.reco-row { display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; scroll-behavior:smooth; }
+		.reco-row::-webkit-scrollbar { height: 6px; }
+		.reco-row::-webkit-scrollbar-track { background: #f0f0f0; border-radius:3px; }
+		.reco-row::-webkit-scrollbar-thumb { background: #ccc; border-radius:3px; }
+		.reco-card { min-width:200px; background:white; border:1px solid #ddd; border-radius:8px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:inherit; display:block; transition:all 0.2s ease; }
+		.reco-card h4 { margin:0 0 6px 0; font-size:14px; font-weight:600; color:#222; }
+		.reco-card p { margin:0; color:#666; font-size:13px; }
+		.reco-card:hover { transform:translateY(-3px); box-shadow:0 4px 12px rgba(0,0,0,0.1); border-color:#0066cc; }
 .no-prices {
 	background: #fff9e6;
 	border: 1px solid #ffe58f;
@@ -436,18 +423,8 @@
 					{% endif %}
 				</div>
 
-				<!-- Acciones: tarjeta con botón debajo de la descripción -->
-				<div class="detail-action-card">
-					<div class="detail-action-content">
-						<div style="flex:1">
-							<div style="font-weight:600; color:#222;">NADA</div>
-							<div style="font-size:13px; color:#666">NADA</div>
-						</div>
-						<div style="width:140px">
-							<button class="detail-action-btn" type="button">NADA</button>
-						</div>
-					</div>
-				</div>
+			<!-- RECOMENDADOS: Medicamentos con mismos principios activos -->
+			(REMOVIDO)
 			</div>
 		</div>
 
@@ -500,6 +477,26 @@
 		</div>
 	</div>
 </div>
+
+<!-- BARRA DE RECOMENDADOS: Full-width -->
+{% if recomendados %}
+<div class="reco-bar">
+	<div class="reco-container">
+		<div class="reco-title">🔗 Medicamentos con los mismos principios activos</div>
+		<div class="reco-row">
+			{% for reco in recomendados %}
+				<a href="{% url 'detalle_presentacion' reco.idpresentacion %}" class="reco-card">
+					<h4>{{ reco.descripcion }}</h4>
+					<p>{{ reco.cantidadvalor }} {{ reco.cantidadunidad }}</p>
+					{% if reco.idmedicamento and reco.idmedicamento.idmarca %}
+						<p style="font-size:12px; color:#999;">{{ reco.idmedicamento.idmarca.nombremarca }}</p>
+					{% endif %}
+				</a>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{% endif %}
 
 <script>
 // Manejo del botón de campana para guardar/eliminar presentación
