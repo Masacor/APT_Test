@@ -213,53 +213,102 @@ def login_usuario(request):
 
 
 # ----------------------- Sign up
+# def signup(request):
+#     if request.method == 'POST':
+#         nombre = request.POST.get('nombre')
+#         email = request.POST.get('email')
+#         password1 = request.POST.get('password1')
+#         password2 = request.POST.get('password2')
+#         fecha_nacimiento = request.POST.get('fecha_nacimiento')
+
+#         errors = []
+
+#         # Validaciones
+#         if not nombre or len(nombre.strip()) < 2:
+#             errors.append('El nombre debe tener al menos 2 caracteres.')
+#         if not email or '@' not in email:
+#             errors.append('Correo electrónico inválido.')
+#         elif Usuario.objects.filter(email=email).exists():
+#             errors.append('Este correo electrónico ya está registrado.')
+#         if not password1 or len(password1) < 6:
+#             errors.append('La contraseña debe tener al menos 6 caracteres.')
+#         elif password1 != password2:
+#             errors.append('Las contraseñas no coinciden.')
+#         try:
+#             fecha_nac = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
+#         except Exception:
+#             errors.append('Fecha de nacimiento inválida.')
+
+#         if errors:
+#             for error in errors:
+#                 messages.error(request, error)
+#             return render(request, 'signup.html')
+
+#         # Crear usuario
+#         try:
+#             Usuario.objects.create(
+#                 nombre=nombre,
+#                 email=email,
+#                 contraseña=make_password(password1),
+#                 fechanacimiento=fecha_nac
+#             )
+#             messages.success(request, '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.')
+#             return redirect('login')
+#         except Exception as e:
+#             messages.error(request, f'Error al crear la cuenta: {str(e)}')
+
+#     return render(request, 'signup.html')
+import json
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .models import Region, Comuna, Usuario
+from datetime import date
+
 def signup(request):
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+        email = request.POST.get("email")
+        contraseña = request.POST.get("password1")
+        fechanacimiento = request.POST.get("fechanacimiento")
+        idcomuna = request.POST.get("idcomuna")
 
-        errors = []
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, "El correo ya está registrado.")
+            return redirect("signup")
 
-        # Validaciones
-        if not nombre or len(nombre.strip()) < 2:
-            errors.append('El nombre debe tener al menos 2 caracteres.')
-        if not email or '@' not in email:
-            errors.append('Correo electrónico inválido.')
-        elif Usuario.objects.filter(email=email).exists():
-            errors.append('Este correo electrónico ya está registrado.')
-        if not password1 or len(password1) < 6:
-            errors.append('La contraseña debe tener al menos 6 caracteres.')
-        elif password1 != password2:
-            errors.append('Las contraseñas no coinciden.')
-        try:
-            fecha_nac = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
-        except Exception:
-            errors.append('Fecha de nacimiento inválida.')
+        usuario = Usuario(
+            nombre=nombre,
+            email=email,
+            contraseña=make_password(contraseña),
+            fechanacimiento=fechanacimiento if fechanacimiento else None,
+            fecharegistro=date.today(),
+            idcomuna=Comuna.objects.get(idcomuna=idcomuna) if idcomuna else None
+        )
+        usuario.save()
 
-        if errors:
-            for error in errors:
-                messages.error(request, error)
-            return render(request, 'signup.html')
+        messages.success(request, "Cuenta creada correctamente.")
+        return redirect("login")
 
-        # Crear usuario
-        try:
-            Usuario.objects.create(
-                nombre=nombre,
-                email=email,
-                contraseña=make_password(password1),
-                fechanacimiento=fecha_nac
-            )
-            messages.success(request, '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.')
-            return redirect('login')
-        except Exception as e:
-            messages.error(request, f'Error al crear la cuenta: {str(e)}')
+    regiones = Region.objects.all()
+    comunas = Comuna.objects.all()
 
-    return render(request, 'signup.html')
+    comunas_json = [
+        {
+            "id": c.idcomuna,
+            "region": c.idregion.idregion if c.idregion else None,
+            "nombre": c.nombrecomuna
+        }
+        for c in comunas
+    ]
 
+    return render(request, "signup.html", {
+        "regiones": regiones,
+        "comunas_json": json.dumps(comunas_json),
+    })
+# -----------------------------------------------------
 
+# ------------------- landing
 def landing(request):
     total_medicamentos = Presentacion.objects.count()
     total_precios = PrecioFarmacia.objects.count()
@@ -274,7 +323,7 @@ def landing(request):
 # --------------- Logout
 def logout(request):
     request.session.flush()
-    return redirect('index')
+    return redirect('landing')
 
 # ---------------------------------------------------
 

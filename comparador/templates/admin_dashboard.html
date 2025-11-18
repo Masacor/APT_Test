@@ -50,5 +50,33 @@
             <h3>Principio Activo</h3>
         </a>
     </div>
+
+    <h2 class="admin-panel-title" style="margin-top: 40px;">
+        Gráficos de estadísticas
+    </h2>
+
+    <!-- Nuevo bloque de cards -->
+    <div class="admin-cards-container">
+
+        <a href="{% url 'admin_usuario_graficos' %}" class="admin-card">
+            <h3>Gráficos de Usuarios</h3>
+        </a>
+
+        <a href="{% url 'admin_usuario_graficos' %}" class="admin-card">
+            <h3>Gráficos de Medicamentos Guardados</h3>
+        </a>
+
+        <a href="{% url 'admin_usuario_graficos' %}" class="admin-card">
+            <h3>Gráficos de Busquedas</h3>
+        </a>
+
+        <!-- Aquí puedes agregar más cards cuando tengas más gráficos -->
+        <!--
+        <a href="#" class="admin-card">
+            <h3>Otro gráfico</h3>
+        </a>
+        -->
+
+    </div>
 </div>
 {% endblock %}
