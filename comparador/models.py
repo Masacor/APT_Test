@@ -71,6 +71,10 @@ class PrecioFarmacia(models.Model):
     preciooferta = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     fecharegistro = models.DateField(default=date.today)
     presentacionurl = models.CharField(max_length=255, blank=True, null=True)
+    pf_urlfoto = models.CharField(max_length=255, blank=True, null=True)
+    pf_descripcion = models.CharField(max_length=255, blank=True, null=True)
+
+
 
     class Meta:
         db_table = 'preciofarmacia'

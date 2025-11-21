@@ -24,6 +24,7 @@ urlpatterns = [
 
 
 
+    # ------------------------------ CRUDS
 
     # ADMIN
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
@@ -53,12 +54,18 @@ urlpatterns = [
     path('dashboard/principioactivo/', views.principioactivo, name='admin_principioactivo'),
 
 
+
+    # --------------------------- GRAFICOS
     # GRAFICOS USUARIOS
     path('dashboard/usuarios/graficos/', views.admin_usuario_graficos, name='admin_usuario_graficos'),
 
+    # GRAFICOS MEDICAMENTOS
+    path("dashboard/medicamentos/graficos/", views.admin_medicamento_graficos, name="admin_medicamento_graficos"),
 
 
 
+
+    # ----------------------------- CRUDS QUE FALTAN
     # LOS QUE FALTAN
     # MEDICAMENTO_PRINCIPIO
     # path('dashboard/medicamento_principio/', views.medicamento_principio, name='admin_medicamento_principio'),

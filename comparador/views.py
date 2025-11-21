@@ -5,54 +5,16 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password# Para sign up
 import re # Para sign up
 from datetime import datetime, date # Para sign up
-from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion, Guardado
-from django.db.models import Min, Max
+from .models import Presentacion, PrincipioActivo, Usuario, PrecioFarmacia, Medicamento, MedicamentoPrincipio, Laboratorio, MarcaComercial, FormaFarmaceutica, ViasAdministracion, Guardado, Region, Comuna
+from django.db.models import Min, Max, Count
 from django.http import Http404, JsonResponse
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
+import json
 
 
 
-
-# # Index
-# def index(request):
-#     query = request.GET.get('q')  # El texto que el usuario busca
-#     if query:
-#         medicamentos = Presentacion.objects.filter(descripcion__icontains=query)
-#     else:
-#         medicamentos = Presentacion.objects.all()
-    
-#     return render(request, 'index.html', {'medicamentos': medicamentos, 'query': query})
-
-# def index(request):
-#     query = request.GET.get('q')
-    
-#     if query:
-#         presentaciones = Presentacion.objects.filter(descripcion__icontains=query)
-#     else:
-#         presentaciones = Presentacion.objects.all()
-    
-#     resultados = []
-    
-#     for p in presentaciones:
-#         # Todos los precios asociados a esa presentación
-#         precios = PrecioFarmacia.objects.filter(idpresentacion=p)
-        
-#         # Si hay precios
-#         for precio in precios:
-#             resultados.append({
-#                 'farmacia': precio.idfarmacia.nombrefarmacia,
-#                 'farmacia_url': precio.idfarmacia.url,
-#                 'precio': precio.precio,
-#                 'precio_oferta': precio.preciooferta,
-#                 'presentacion': p.descripcion,
-#                 'medicamento': p.idmedicamento.registrosanitario if p.idmedicamento else "",
-#                 'marca': p.idmedicamento.idmarca.nombremarca if p.idmedicamento and p.idmedicamento.idmarca else "",
-#                 'laboratorio': p.idmedicamento.idlaboratorio.nombrelaboratorio if p.idmedicamento and p.idmedicamento.idlaboratorio else "",
-#             })
-
-#     return render(request, 'index.html', {'resultados': resultados, 'query': query})
-
+# -------------------------------- INDEX
 def index(request):
     query = request.GET.get('q', '')
     resultados = []
@@ -78,50 +40,11 @@ def index(request):
             })
 
     return render(request, 'index.html', {'resultados': resultados, 'query': query})
+# -----------------------------
 
 
-# login
-# def login(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
 
-#         errors = []
-
-#         if not email:
-#             errors.append('El correo electrónico es obligatorio')
-#         elif '@' not in email:
-#             errors.append('Ingresa un correo electrónico válido')
-
-#         if not password:
-#             errors.append('La contraseña es obligatoria')
-#         elif len(password) < 6:
-#             errors.append('La contraseña debe tener al menos 6 caracteres')
-
-#         if errors:
-#             for error in errors:
-#                 messages.error(request, error)
-#         else:
-#             try:
-#                 usuario = Usuario.objects.get(email=email)
-                
-#                 # Verificar contraseña
-#                 if usuario.contraseña and check_password(password, usuario.contraseña):
-#                     # Guardamos sesión manualmente
-#                     request.session['usuario_id'] = usuario.idusuario
-#                     request.session['usuario_nombre'] = usuario.nombre
-#                     # messages.success(request, f'¡Bienvenido {usuario.nombre}!')
-#                     return redirect('index')
-#                 else:
-#                     messages.error(request, 'Correo o contraseña incorrectos')
-
-#             except Usuario.DoesNotExist:
-#                 messages.error(request, 'Correo o contraseña incorrectos')
-
-#     return render(request, 'login.html')
-
-
-# --------------------- Login
+# ----------------------------- LOGIN
 def login_usuario(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -156,115 +79,11 @@ def login_usuario(request):
             messages.error(request, 'Correo o contraseña incorrectos.')
 
     return render(request, 'login.html')
-
-# ----------------------  Panel de Admin CRUD
-# def admin_dashboard(request):
-#     if not request.session.get('is_admin'):
-#         return redirect('login')
-
-#     # Crear usuario
-#     # if request.method == 'POST' and 'crear' in request.POST:
-#     #     nombre = request.POST['nombre']
-#     #     correo = request.POST['correo']
-#     #     contraseña = make_password(request.POST['contraseña'])
-#     #     Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
-#     #     return redirect('admin_dashboard')
-
-#     if request.method == 'POST' and 'crear' in request.POST:
-#         nombre = request.POST['nombre']
-#         correo = request.POST['correo']
-#         contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-#         Usuario.objects.create(nombre=nombre, email=correo, contraseña=contraseña)
-#         return redirect('admin_dashboard')
-
-#     # Editar usuario
-#     # if request.method == 'POST' and 'editar' in request.POST:
-#     #     usuario_id = request.POST['usuario_id']
-#     #     usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-#     #     usuario.nombre = request.POST['nombre']
-#     #     usuario.email = request.POST['correo']
-#     #     if request.POST['contraseña']:
-#     #         usuario.contraseña = make_password(request.POST['contraseña'])
-#     #     usuario.save()
-#     #     return redirect('admin_dashboard')
-
-#     if request.method == 'POST' and 'editar' in request.POST:
-#         usuario_id = request.POST['usuario_id']
-#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-#         usuario.nombre = request.POST['nombre']
-#         usuario.email = request.POST['correo']
-#         if request.POST['contraseña']:
-#             usuario.contraseña = make_password(request.POST['contraseña'])  # 🔹 hash
-#         usuario.save()
-#         return redirect('admin_dashboard')
-
-#     # Eliminar usuario
-#     if request.method == 'POST' and 'eliminar' in request.POST:
-#         usuario_id = request.POST['usuario_id']
-#         usuario = get_object_or_404(Usuario, idusuario=usuario_id)
-#         usuario.delete()
-#         return redirect('admin_dashboard')
-
-
-#     # Listar usuarios
-#     usuarios = Usuario.objects.all()
-#     return render(request, 'admin_dashboard.html', {'usuarios': usuarios})
+# ----------------------------
 
 
 
-# ----------------------- Sign up
-# def signup(request):
-#     if request.method == 'POST':
-#         nombre = request.POST.get('nombre')
-#         email = request.POST.get('email')
-#         password1 = request.POST.get('password1')
-#         password2 = request.POST.get('password2')
-#         fecha_nacimiento = request.POST.get('fecha_nacimiento')
-
-#         errors = []
-
-#         # Validaciones
-#         if not nombre or len(nombre.strip()) < 2:
-#             errors.append('El nombre debe tener al menos 2 caracteres.')
-#         if not email or '@' not in email:
-#             errors.append('Correo electrónico inválido.')
-#         elif Usuario.objects.filter(email=email).exists():
-#             errors.append('Este correo electrónico ya está registrado.')
-#         if not password1 or len(password1) < 6:
-#             errors.append('La contraseña debe tener al menos 6 caracteres.')
-#         elif password1 != password2:
-#             errors.append('Las contraseñas no coinciden.')
-#         try:
-#             fecha_nac = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
-#         except Exception:
-#             errors.append('Fecha de nacimiento inválida.')
-
-#         if errors:
-#             for error in errors:
-#                 messages.error(request, error)
-#             return render(request, 'signup.html')
-
-#         # Crear usuario
-#         try:
-#             Usuario.objects.create(
-#                 nombre=nombre,
-#                 email=email,
-#                 contraseña=make_password(password1),
-#                 fechanacimiento=fecha_nac
-#             )
-#             messages.success(request, '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.')
-#             return redirect('login')
-#         except Exception as e:
-#             messages.error(request, f'Error al crear la cuenta: {str(e)}')
-
-#     return render(request, 'signup.html')
-import json
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Region, Comuna, Usuario
-from datetime import date
-
+# ---------------------------- SIGNUP
 def signup(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -306,9 +125,11 @@ def signup(request):
         "regiones": regiones,
         "comunas_json": json.dumps(comunas_json),
     })
-# -----------------------------------------------------
+# --------------------------------
 
-# ------------------- landing
+
+
+# -------------------------------- lANDING
 def landing(request):
     total_medicamentos = Presentacion.objects.count()
     total_precios = PrecioFarmacia.objects.count()
@@ -319,15 +140,19 @@ def landing(request):
         'total_precios': total_precios,
         'total_usuarios': total_usuarios,
     })
+# ---------------------------------
 
-# --------------- Logout
+
+
+# --------------------------------- LOGOUT
 def logout(request):
     request.session.flush()
     return redirect('landing')
+# ---------------------------------
 
-# ---------------------------------------------------
 
 
+# --------------------------------- BUSCADOR_PRUEBA
 def buscador_prueba(request):
     query = request.GET.get('q', '').strip()
     filtros_marcas = request.GET.getlist('marca')
@@ -417,9 +242,11 @@ def buscador_prueba(request):
     }
 
     return render(request, 'buscador_prueba.html', context)
+#--------------------------
 
 
 
+# ------------------------- INFORMACION_PRESENTACION
 def informacion_presentacion(request, descripcion):
     presentacion = get_object_or_404(Presentacion, descripcion=descripcion)
     precios = PrecioFarmacia.objects.filter(idpresentacion=presentacion).order_by('precio')
@@ -429,6 +256,7 @@ def informacion_presentacion(request, descripcion):
         'precios': precios
     }
     return render(request, 'informacion_presentacion.html', context)
+# --------------------------
 
 
 '''
@@ -693,7 +521,7 @@ def guardar_presentacion(request):
 
 
 
-# --------------------- CRUDS de todo
+# ----------------------- CRUDS de todo
 
 # ----------------------- DASHBOARD
 def admin_dashboard(request):
@@ -703,7 +531,9 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html')
 # -----------------------
 
-# -------------------- Usuario
+
+
+# ----------------------- USUARIO
 def admin_usuario(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -741,7 +571,9 @@ def admin_usuario(request):
 
 # --------------------------------
 
-# ------------------------------- Medicamentos
+
+
+# ------------------------------- MEDICAMENTOS
 def admin_medicamentos(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -819,9 +651,11 @@ def admin_medicamentos(request):
         'vias': vias,
     }
     return render(request, 'admin_medicamentos.html', context)
-# ---------------------------------------------------
+# -------------------------------
 
-# ------------------ Presentacion
+
+
+# ------------------------------- PRESENTACION
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Presentacion, Medicamento
@@ -876,7 +710,9 @@ def presentacion(request):
     })
 # ---------------------
 
-# --------------------- Laboratorio
+
+
+# --------------------- LABORATORIO
 def laboratorio(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -930,9 +766,11 @@ def laboratorio(request):
     # Listar todos los laboratorios
     laboratorios = Laboratorio.objects.all().order_by('idlaboratorio')
     return render(request, 'admin_laboratorio.html', {'laboratorios': laboratorios})
-# ---------------------------------------------------------
+# -------------------------------
 
-# --------------------------- Marcacomercial
+
+
+# ------------------------------- MARCACOMERCIAL
 def marcacomercial(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -996,9 +834,11 @@ def marcacomercial(request):
         'marcas': marcas,
     }
     return render(request, 'admin_marcacomercial.html', context)
-# ----------------------------------------
+# -------------------------
 
-# --------------- Vias_administracion
+
+
+# ------------------------- VIAS_ADMINISTRACION
 def vias_administracion(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -1076,9 +916,11 @@ def vias_administracion(request):
         'vias': vias,
     }
     return render(request, 'admin_vias_administracion.html', context)
-# -------------------------------------------------
+# ---------------------------
 
-# ----------------------- FormaFarmaceutica
+
+
+# --------------------------- FORMAFARMACEUTICA
 def formafarmaceutica(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -1133,9 +975,11 @@ def formafarmaceutica(request):
     # Mostrar todas las formas farmacéuticas
     formas = FormaFarmaceutica.objects.all().order_by('idforma')
     return render(request, 'admin_formafarmaceutica.html', {'formas': formas})
-# -----------------------------------
+# --------------------------
 
-# -------------------- PrincipioActivo
+
+
+# -------------------------- PRINCIPIOACTIVO
 def principioactivo(request):
     if not request.session.get('is_admin'):
         return redirect('login')
@@ -1186,7 +1030,7 @@ def principioactivo(request):
     return render(request, 'admin_principioactivo.html', {'principios': principios})
 # --------------------------------
 
-# ----------------------- PrecioFarmacia
+# -------------------------------- PrecioFarmacia
 # ----------------------------------------------------------------------------------------------------------
 
 
@@ -1267,8 +1111,11 @@ def perfil_usuario(request):
         'usuario': usuario,
         'guardados': guardados,
     })
+# ----------------------------
 
 
+
+# ---------------------------- GUARDADOS
 def guaradados(request):
     """Mostrar los guardados del usuario en forma de tarjetas.
 
@@ -1295,7 +1142,7 @@ def guaradados(request):
         'guardados': guardados,
         'usuario': usuario,
     })
-# ----------------------------------------------------------
+# ---------------------------------
 
 
 
@@ -1305,13 +1152,9 @@ def guaradados(request):
 
 
 
-# ------------------------ GRAFICOS DE PRUEBA
-from django.shortcuts import render
-from django.db.models import Count
-from datetime import date
-from .models import Usuario
-import json
+# -----------------------------------------------GRAFICOS DE LAS TABLAS
 
+# ----------------------------- GRAFICO DE TABLA USUARIO
 def admin_usuario_graficos(request):
     usuarios = Usuario.objects.all()
 
@@ -1352,3 +1195,57 @@ def admin_usuario_graficos(request):
     }
 
     return render(request, 'admin_usuario_graficos.html', context)
+# ------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+# ------------------------ GRAFICOS MEDICAMENTOS
+def admin_medicamento_graficos(request):
+    # Por marca
+    por_marca = Medicamento.objects.values("idmarca__nombremarca").annotate(total=Count("idmedicamento")).order_by("-total")
+    marcas_labels = [x["idmarca__nombremarca"] or "Sin marca" for x in por_marca]
+    marcas_data = [x["total"] for x in por_marca]
+
+    # Por laboratorio
+    por_laboratorio = Medicamento.objects.values("idlaboratorio__nombrelaboratorio").annotate(total=Count("idmedicamento")).order_by("-total")
+    lab_labels = [x["idlaboratorio__nombrelaboratorio"] or "Sin laboratorio" for x in por_laboratorio]
+    lab_data = [x["total"] for x in por_laboratorio]
+
+    # Por forma farmacéutica
+    por_forma = Medicamento.objects.values("idforma__nombreforma").annotate(total=Count("idmedicamento")).order_by("-total")
+    forma_labels = [x["idforma__nombreforma"] or "Sin forma" for x in por_forma]
+    forma_data = [x["total"] for x in por_forma]
+
+    # Por vía de administración
+    por_via = Medicamento.objects.values("id_via__via").annotate(total=Count("idmedicamento")).order_by("-total")
+    via_labels = [x["id_via__via"] or "Sin vía" for x in por_via]
+    via_data = [x["total"] for x in por_via]
+
+    # Por principio activo
+    por_principio = MedicamentoPrincipio.objects.values("idprincipio__nombre").annotate(total=Count("idmedicamento")).order_by("-total")
+    principio_labels = [x["idprincipio__nombre"] or "Sin principio" for x in por_principio]
+    principio_data = [x["total"] for x in por_principio]
+
+    # Diccionario de datos
+    datos = {
+        "chartMarca": {"labels": marcas_labels, "data": marcas_data},
+        "chartLaboratorio": {"labels": lab_labels, "data": lab_data},
+        "chartForma": {"labels": forma_labels, "data": forma_data},
+        "chartVia": {"labels": via_labels, "data": via_data},
+        "chartPrincipio": {"labels": principio_labels, "data": principio_data},
+    }
+
+    # Diccionario de nombres de gráficos (para iterar en template)
+    graficos = {
+        "chartMarca": "Medicamentos por Marca",
+        "chartLaboratorio": "Medicamentos por Laboratorio",
+        "chartForma": "Por Forma Farmacéutica",
+        "chartVia": "Por Vía de Administración",
+        "chartPrincipio": "Por Principio Activo"
+    }
+
+    return render(request, "admin_medicamento_graficos.html", {
+        "datos_json": json.dumps(datos),
+        "graficos": graficos
+    })
+

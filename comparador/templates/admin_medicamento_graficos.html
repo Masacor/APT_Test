@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_medicamento_graficos.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h1>Gráficos de Medicamentos</h1>
+
+<div class="chart-grid">
+
+    {% for chart_id, chart_name in graficos.items %}
+    <div class="chart-card">
+        <h3>{{ chart_name }}</h3>
+        <div class="chart-controls">
+            <label>Top N:
+                <select class="top-n" data-chart="{{ chart_id }}">
+                    <option value="0">Todos</option>
+                    <option value="3">Top 3</option>
+                    <option value="5">Top 5</option>
+                    <option value="10">Top 10</option>
+                </select>
+            </label>
+        </div>
+        <canvas id="{{ chart_id }}"></canvas>
+    </div>
+    {% endfor %}
+
+</div>
+
+<!-- Datos de Django en JSON -->
+<script id="datos-django" type="application/json">
+{{ datos_json|safe }}
+</script>
+
+<script src="{% static 'js/admin_medicamento_graficos.js' %}"></script>
+
+{% endblock %}
