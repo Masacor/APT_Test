@@ -40,4 +40,92 @@
         </div>
     </div>  -->
 </div>
+
+<!-- Componente de pestañas -->
+<div class="info-tabs-section">
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <button class="tab-button active" data-tab="politicas">Políticas</button>
+            <button class="tab-button" data-tab="como-se-usa">Cómo se usa</button>
+            <button class="tab-button" data-tab="mision">Misión</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active" id="politicas">
+                <h3>Políticas de Privacidad y Uso</h3>
+                <div class="tab-content-text">
+                    <p>En Farmato, nos comprometemos a proteger tu privacidad y garantizar la seguridad de tus datos personales.</p>
+                    <ul>
+                        <li><strong>Datos personales:</strong> Solo recopilamos la información necesaria para brindarte un mejor servicio.</li>
+                        <li><strong>Uso de información:</strong> Tus datos se utilizan únicamente para mejorar tu experiencia en la plataforma.</li>
+                        <li><strong>Seguridad:</strong> Implementamos medidas de seguridad avanzadas para proteger tu información.</li>
+                        <li><strong>Cookies:</strong> Utilizamos cookies para mejorar la funcionalidad del sitio y personalizar tu experiencia.</li>
+                        <li><strong>Derechos del usuario:</strong> Tienes derecho a acceder, modificar o eliminar tus datos personales en cualquier momento.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-panel" id="como-se-usa">
+                <h3>Cómo usar Farmato</h3>
+                <div class="tab-content-text">
+                    <p>Farmato es una plataforma sencilla e intuitiva para comparar precios de medicamentos. Sigue estos pasos:</p>
+                    <ol>
+                        <li><strong>Busca tu medicamento:</strong> Utiliza la barra de búsqueda en la parte superior para encontrar el medicamento que necesitas.</li>
+                        <li><strong>Revisa los resultados:</strong> Verás una lista de farmacias con los precios disponibles, ordenados de menor a mayor.</li>
+                        <li><strong>Compara precios:</strong> Compara los precios entre diferentes farmacias y encuentra la mejor opción para ti.</li>
+                        <li><strong>Accede a la farmacia:</strong> Haz clic en "Ver en farmacia" para visitar el sitio web de la farmacia y realizar tu compra.</li>
+                        <li><strong>Guarda tus favoritos:</strong> Si tienes una cuenta, puedes guardar medicamentos para consultarlos más tarde.</li>
+                    </ol>
+                    <p class="tip"><strong>💡 Tip:</strong> Puedes buscar por nombre del medicamento, principio activo o marca comercial.</p>
+                </div>
+            </div>
+            <div class="tab-panel" id="mision">
+                <h3>Nuestra Misión</h3>
+                <div class="tab-content-text">
+                    <p>En Farmato, nuestra misión es empoderar a los usuarios chilenos para que tomen decisiones informadas sobre sus medicamentos.</p>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <h4>🎯 Transparencia</h4>
+                            <p>Proporcionamos información clara y actualizada sobre precios de medicamentos en diferentes farmacias.</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>💊 Accesibilidad</h4>
+                            <p>Buscamos hacer que la información sobre medicamentos sea accesible para todos los chilenos.</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>🤝 Confianza</h4>
+                            <p>Construimos relaciones de confianza con nuestros usuarios mediante información precisa y actualizada.</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>📊 Comparación</h4>
+                            <p>Facilitamos la comparación de precios para que puedas ahorrar en tus compras de medicamentos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Funcionalidad de pestañas
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+
+                // Remover clase active de todos los botones y paneles
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanels.forEach(panel => panel.classList.remove('active'));
+
+                // Agregar clase active al botón y panel seleccionados
+                this.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    });
+</script>
 {% endblock %}

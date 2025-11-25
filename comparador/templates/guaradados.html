@@ -1,10 +1,146 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Guaradados{% endblock %}
+{% block title %}Guardados{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/usuario_perfil.css' %}">
+<style>
+/* Variables CSS para guardados */
+:root {
+    --primary: #00796b;
+    --primary-dark: #005b4f;
+    --primary-light: #4caf50;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --text-light: #90a4ae;
+    --border-color: #e0e0e0;
+    --border-radius-md: 12px;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+}
+
+/* Estilos mejorados para tarjetas de guardados - estilo buscador_prueba */
+.guardados-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.guardado-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.guardado-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
+}
+
+.guardado-card:hover::before {
+    transform: scaleX(1);
+}
+
+.guardado-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-body { 
+    padding: var(--spacing-md); 
+}
+
+.card-title { 
+    font-size: 1rem; 
+    margin: 0 0 var(--spacing-xs) 0; 
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.4;
+} 
+
+.card-sub { 
+    color: var(--text-secondary); 
+    font-size: 0.875rem; 
+    margin: 0 0 var(--spacing-xs) 0; 
+} 
+
+.card-meta { 
+    font-size: 0.8125rem; 
+    color: var(--text-secondary); 
+    margin-bottom: var(--spacing-sm); 
+} 
+
+.card-actions { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+} 
+
+.btn-link { 
+    color: var(--primary); 
+    text-decoration: none; 
+    font-weight: 600;
+    transition: var(--transition-base);
+    font-size: 0.875rem;
+} 
+
+.btn-link:hover { 
+    color: var(--primary-dark);
+    text-decoration: underline;
+} 
+
+.date { 
+    color: var(--text-light); 
+    font-size: 0.75rem; 
+}
+
+@media (max-width: 1024px) {
+    .guardados-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .guardados-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+}
+
+@media (max-width: 480px) { 
+    .guardados-grid { 
+        grid-template-columns: 1fr; 
+    } 
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container perfil-container">
     <h2>Guardados</h2>
 
     {% if guardados and guardados.count %}
@@ -25,7 +161,7 @@
                         </p>
                         <div class="card-actions">
                             <a href="{% url 'detalle_presentacion' p.idpresentacion %}" class="btn-link">Ver detalle</a>
-                            <span class="date">{{ g.fechaagregado }}</span>
+                            <span class="date">{{ g.fechaagregado|date:"d/m/Y" }}</span>
                         </div>
                     </div>
                 </div>
@@ -33,37 +169,16 @@
             {% endfor %}
         </div>
     {% else %}
-        <p>No tienes elementos guardados todavía.</p>
+        <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+            <p style="font-size: 1.125rem; margin-bottom: var(--spacing-sm);">No tienes elementos guardados todavía.</p>
+            <p style="font-size: 0.9375rem; color: var(--text-light);">Explora medicamentos y guárdalos para verlos aquí.</p>
+        </div>
     {% endif %}
 
-    <p style="margin-top:1rem;"><a href="{% url 'perfil_usuario' %}">Volver al perfil</a></p>
+    <p style="margin-top: var(--spacing-lg); text-align: center;">
+        <a href="{% url 'perfil_usuario' %}" style="color: var(--primary); text-decoration: none; font-weight: 600; transition: var(--transition-base);">
+            ← Volver al perfil
+        </a>
+    </p>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Estilos sencillos para tarjetas de guardados */
-.guardados-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
-.guardado-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    overflow: hidden;
-    border: 1px solid #eee;
-}
-.card-body { padding: 14px; }
-.card-title { font-size: 16px; margin: 0 0 8px 0; color: #222; }
-.card-sub { color: #666; font-size: 14px; margin: 0 0 8px 0; }
-.card-meta { font-size: 13px; color: #555; margin-bottom: 10px; }
-.card-actions { display:flex; justify-content:space-between; align-items:center; }
-.btn-link { color: #007bff; text-decoration: none; font-weight:600; }
-.btn-link:hover { text-decoration:underline; }
-.date { color:#999; font-size:12px; }
-@media (max-width:480px){ .guardados-grid { grid-template-columns: 1fr; } }
-</style>
 {% endblock %}

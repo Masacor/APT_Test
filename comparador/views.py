@@ -72,7 +72,7 @@ def login_usuario(request):
                 if usuario.is_admin:
                     return redirect('admin_dashboard')
                 else:
-                    return redirect('index')
+                    return redirect('landing')
             else:
                 messages.error(request, 'Correo o contraseña incorrectos.')
         except Usuario.DoesNotExist:
@@ -167,8 +167,13 @@ def buscador_prueba(request):
     filtros_principios = [int(f) for f in filtros_principios if f.isdigit()]
     filtros_vias = [int(f) for f in filtros_vias if f.isdigit()]
 
+    # Obtener todas las presentaciones que tienen precios en PrecioFarmacia
+    presentaciones_con_precio = Presentacion.objects.filter(
+        preciofarmacia__isnull=False
+    ).distinct()
+
     # Filtrar presentaciones
-    presentaciones = Presentacion.objects.all()
+    presentaciones = presentaciones_con_precio
     if query:
         presentaciones = presentaciones.filter(descripcion__icontains=query)
 
@@ -199,33 +204,35 @@ def buscador_prueba(request):
         if precio_obj:
             resultados.append({
                 'presentacion': presentacion,
-                'precio': precio_obj.precio,  # solo el valor numérico
+                'precio': int(precio_obj.precio),  # Convertir a entero
                 'farmacia': precio_obj.idfarmacia.nombrefarmacia,  # nombre de la farmacia
             })
 
-    # IDs de medicamentos en resultados
-    medicamentos_ids = presentaciones.values_list('idmedicamento_id', flat=True).distinct()
-
-    # Filtros dinámicos basados en resultados
-    marcas_disponibles = MarcaComercial.objects.filter(
-        idmarca__in=medicamentos_ids
+    # Obtener IDs de medicamentos que tienen precios en PrecioFarmacia
+    medicamentos_con_precio = Medicamento.objects.filter(
+        presentacion__preciofarmacia__isnull=False
     ).distinct()
+
+    # Filtros dinámicos basados SOLO en medicamentos que tienen precios
+    marcas_disponibles = MarcaComercial.objects.filter(
+        idmarca__in=medicamentos_con_precio.values_list('idmarca', flat=True).distinct()
+    ).distinct().order_by('nombremarca')
 
     principios_disponibles = PrincipioActivo.objects.filter(
-        medicamentoprincipio__idmedicamento_id__in=medicamentos_ids
-    ).distinct()
+        medicamentoprincipio__idmedicamento__in=medicamentos_con_precio
+    ).distinct().order_by('nombre')
 
     vias_disponibles = ViasAdministracion.objects.filter(
-        id_via__in=medicamentos_ids
-    ).distinct()
+        id_via__in=medicamentos_con_precio.values_list('id_via', flat=True).distinct()
+    ).distinct().order_by('via')
 
-    # Precio global de la búsqueda (para slider)
+    # Precio global de la búsqueda (para slider) - solo de PrecioFarmacia
     precio_global = PrecioFarmacia.objects.aggregate(
         precio_min=Min('precio'),
         precio_max=Max('precio')
     )
-    precio_min = precio_global['precio_min'] or 0
-    precio_max = precio_global['precio_max'] or 1000
+    precio_min = int(precio_global['precio_min'] or 0)
+    precio_max = int(precio_global['precio_max'] or 1000)
 
     context = {
         'query': query,
@@ -238,7 +245,7 @@ def buscador_prueba(request):
         'filtros_vias': [str(f) for f in filtros_vias],
         'precio_min': precio_min,
         'precio_max': precio_max,
-        'precio_actual': precio_filtro or precio_max,  # Valor actual del slider (por defecto el máximo)
+        'precio_actual': int(precio_filtro) if precio_filtro else precio_max,  # Valor actual del slider (por defecto el máximo)
     }
 
     return render(request, 'buscador_prueba.html', context)
