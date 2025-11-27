@@ -40,6 +40,11 @@ function crearChart(id, tipo, labels, data){
             },
             scales: tipo.includes("bar") || tipo.includes("line") ? {
                 y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            } : tipo === "polarArea" ? {
+                r: {               // escala radial para polarArea
+                    beginAtZero: true,
+                    ticks: { display: false } // oculta los números de la escala
+                }
             } : {}
         }
     });
