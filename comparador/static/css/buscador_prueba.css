@@ -1328,10 +1328,9 @@ input[type="range"]::-moz-range-track {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%;
-    min-height: 240px;
+    height: 330px;
     transition: var(--transition-base);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 3px solid rgb(99, 171, 107);
     position: relative;
 }
 
@@ -1493,4 +1492,89 @@ input[type="range"]::-moz-range-track {
     .results-container .card img {
         height: 120px;
     }
+}
+
+
+/*----------------------------------- SOLO PARA PRESENTAR Y HACER EL VIDEO*/
+/* ======= Buscador Mejorado ======= */
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border-radius: 50px;
+    padding: 5px 10px;
+    max-width: 100%; /* para que se ajuste al contenedor */
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.search-wrapper:focus-within {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 0.875rem 1.5rem; /* más ancho */
+    font-size: 1rem;
+    border-radius: 50px;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: inherit;
+}
+
+.search-input::placeholder {
+    color: var(--text-light);
+}
+
+/* Botón de búsqueda con icono */
+.search-button {
+    background: var(--primary);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-white);
+    font-size: 1.25rem; /* tamaño del icono */
+    margin-left: 8px;
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.search-button:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.search-button:active {
+    transform: scale(0.98);
+}
+
+/* Icono de lupa dentro del botón */
+.search-button::before {
+    content: "\1F50D"; /* Unicode lupa 🔍 */
+}
+
+.search-container {
+    width: 580px; /* permite que ocupe todo el ancho disponible */
+    max-width: 800px; /* opcional: límite máximo */
+    margin: 0 auto; /* centrar en la página */
+}
+
+.search-wrapper {
+    display: flex;
+    width: 100%; /* asegura que se expanda completamente */
+    margin-top: 15px;
+}
+
+.search-input {
+    flex: 1; /* ocupa todo el espacio disponible */
+    min-width: 0; /* evita overflow en flexbox */
 }
